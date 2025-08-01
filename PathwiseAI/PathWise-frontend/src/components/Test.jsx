@@ -6,66 +6,13 @@ import {
   ArrowRight, 
   CheckCircle,
   Circle,
-  Flag
+  Flag,
+  XCircle
 } from "lucide-react";
+import assessmentQuestions from "../data/assessmentQuestions";
 
-const sampleQuestions = [
-  {
-    id: 1,
-    question: "What is the correct way to declare a variable in JavaScript ES6?",
-    options: [
-      "var myVariable = 'hello';",
-      "let myVariable = 'hello';", 
-      "const myVariable = 'hello';",
-      "Both B and C are correct"
-    ],
-    correctAnswer: 3
-  },
-  {
-    id: 2,
-    question: "Which method is used to add an element to the end of an array?",
-    options: [
-      "array.push()",
-      "array.add()",
-      "array.append()",
-      "array.insert()"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 3,
-    question: "What does 'DOM' stand for in web development?",
-    options: [
-      "Document Object Model",
-      "Data Object Management",
-      "Dynamic Object Method",
-      "Document Oriented Model"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 4,
-    question: "Which JavaScript function is used to parse JSON strings?",
-    options: [
-      "JSON.parse()",
-      "JSON.stringify()",
-      "parseJSON()",
-      "JSON.decode()"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 5,
-    question: "What is the purpose of the 'async' keyword in JavaScript?",
-    options: [
-      "To make functions run faster",
-      "To declare asynchronous functions",
-      "To handle errors",
-      "To create loops"
-    ],
-    correctAnswer: 1
-  }
-];
+
+
 
 export default function Test() {
   const navigate = useNavigate();
@@ -73,64 +20,70 @@ export default function Test() {
   const [selectedPath, setSelectedPath] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("");
-  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    setSelectedCourse(urlParams.get('course') || "Computer Science");
-    setSelectedPath(urlParams.get('path') || "fintech");
-    setSelectedRole(urlParams.get('role') || "software-engineer");
-    setSelectedSkill(urlParams.get('skill') || "javascript");
+    const course = urlParams.get("course") || "";
+    const path = urlParams.get("path") || "";
+    const role = urlParams.get("role") || "";
+    const skill = urlParams.get("skill") || "";
+
+    setSelectedCourse(course);
+    setSelectedPath(path);
+    setSelectedRole(role);
+    setSelectedSkill(skill);
   }, []);
 
   useEffect(() => {
     if (timeLeft > 0 && !isSubmitted) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && !isSubmitted) {
       handleSubmit();
     }
   }, [timeLeft, isSubmitted]);
 
+  const sampleQuestions = selectedSkill && Array.isArray(assessmentQuestions[selectedSkill])
+    ? assessmentQuestions[selectedSkill]
+    : [];
+
+  const currentQ = sampleQuestions[currentQuestion] || {};
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const handleAnswerSelect = (questionId, answerIndex) => {
-    setAnswers(prev => ({
+    if (isSubmitted) return;
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: answerIndex
+      [questionId]: answerIndex,
     }));
   };
-const createPageUrl = (pageName) => {
-  const pageRoutes = {
-    SkillsPage: "/skills",            // or "/career-skills" or your actual path
-    CareerPathPage: "/career-path",   // match this to your <Route path="..." />
-    JobRolePage: "/job-roles",        // match this to your <Route path="..." />
-    Assessment: "/assessment",        // or your actual path for assessment 
-    ResultPage: "/result" ,                // or your actual path for result 
-     TestPage: "/test",              // or your actual path for test
-  };
 
-  return pageRoutes[pageName] || "/";
-};
-
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    const score = calculateScore();
-    navigate(createPageUrl("ResultPage") + 
-      `?course=${encodeURIComponent(selectedCourse)}&path=${selectedPath}&role=${selectedRole}&skill=${selectedSkill}&score=${score}`);
+  const createPageUrl = (pageName) => {
+    const pageRoutes = {
+      SkillsPage: "/skills",
+      CareerPathPage: "/career-path",
+      JobRolePage: "/job-roles",
+      Assessment: "/assessment",
+      ResultPage: "/result",
+      TestPage: "/test",
+    };
+    return pageRoutes[pageName] || "/";
   };
 
   const calculateScore = () => {
+    if (sampleQuestions.length === 0) return 0;
     let correct = 0;
-    sampleQuestions.forEach(question => {
+    sampleQuestions.forEach((question) => {
       if (answers[question.id] === question.correctAnswer) {
         correct++;
       }
@@ -138,19 +91,52 @@ const createPageUrl = (pageName) => {
     return Math.round((correct / sampleQuestions.length) * 100);
   };
 
-  const currentQ = sampleQuestions[currentQuestion];
-  const progress = ((currentQuestion + 1) / sampleQuestions.length) * 100;
+  const handleSubmit = () => {
+    if (isSubmitted) return;
+    setIsSubmitted(true);
+    const score = calculateScore();
+    navigate(
+      createPageUrl("ResultPage") +
+        `?course=${encodeURIComponent(selectedCourse)}&path=${selectedPath}&role=${selectedRole}&skill=${selectedSkill}&score=${score}`
+    );
+  };
+
+  const progress = sampleQuestions.length
+    ? ((currentQuestion + 1) / sampleQuestions.length) * 100
+    : 0;
   const answeredCount = Object.keys(answers).length;
+
+  // Early empty state if required selection missing or no questions
+  if (!selectedSkill || sampleQuestions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-900 py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-xl border border-red-300 p-8 text-center">
+            <h2 className="text-2xl font-bold text-red-400 mb-2">Cannot start assessment</h2>
+            <p className="text-zinc-300 mb-4">
+              { !selectedSkill
+                ? `No skill selected. Please provide a valid skill in the query string.`
+                : `The selected skill "${selectedSkill}" has no questions defined.` }
+            </p>
+            <p className="text-sm text-zinc-300">
+              Received parameters: course="{selectedCourse || 'none'}", path="{selectedPath || 'none'}", role="{selectedRole || 'none'}", skill="{selectedSkill || 'none'}".
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header with Timer */}
         <div className="bg-white backdrop-blur-xl rounded-2xl shadow-lg border border-green-100 p-6 mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">JavaScript Assessment</h1>
-              <p className="text-gray-600">Question {currentQuestion + 1} of {sampleQuestions.length}</p>
+              <h1 className="text-xl font-bold text-gray-900">{selectedSkill} Assessment</h1>
+              <p className="text-gray-600">
+                Question {currentQuestion + 1} of {sampleQuestions.length}
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-green-600">
@@ -162,20 +148,19 @@ const createPageUrl = (pageName) => {
               </div>
             </div>
           </div>
-          <progress value={progress} 
-            className="w-full h-3 mt-4 rounded-full overflow-hidden 
-                [&::-webkit-progress-bar]:bg-orange-200 
-                [&::-webkit-progress-value]:bg-green-600"  />
+          <progress
+            value={progress}
+            className="w-full h-3 mt-4 rounded-full overflow-hidden [&::-webkit-progress-bar]:bg-orange-200 [&::-webkit-progress-value]:bg-green-600"
+          />
         </div>
 
-        {/* Question Card */}
         <div className="bg-white backdrop-blur-xl rounded-3xl shadow-2xl border border-green-100 p-8 mb-8">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-green-500  rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">{currentQuestion + 1}</span>
               </div>
-              <span className="text-sm text-grren-500 font-medium">
+              <span className="text-sm text-green-500 font-medium">
                 Question {currentQuestion + 1}
               </span>
             </div>
@@ -184,27 +169,44 @@ const createPageUrl = (pageName) => {
             </h2>
           </div>
 
-          {/* Answer Options */}
           <div className="space-y-4 mb-8">
-            {currentQ.options.map((option, index) => {
+            {currentQ.options?.map((option, index) => {
               const isSelected = answers[currentQ.id] === index;
+              const isCorrect = isSubmitted && currentQ.correctAnswer === index;
+              const isWrong = isSubmitted && isSelected && currentQ.correctAnswer !== index;
+
               return (
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(currentQ.id, index)}
+                  disabled={isSubmitted}
                   className={`w-full text-left p-6 rounded-2xl border-2 transition-all duration-200 ${
-                    isSelected
-                      ? "border-green-500 bg-green-50"
+                    isCorrect
+                      ? "border-green-500 bg-green-100"
+                      : isWrong
+                      ? "border-red-500 bg-red-100"
+                      : isSelected
+                      ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:border-green-300 hover:bg-green-25"
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      isSelected
-                        ? "border-green-500 bg-green-500"
-                        : "border-gray-300"
-                    }`}>
-                      {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+                    <div
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        isCorrect
+                          ? "border-green-500 bg-green-500"
+                          : isWrong
+                          ? "border-red-500 bg-red-500"
+                          : isSelected
+                          ? "border-blue-500 bg-blue-500"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      {isCorrect && <CheckCircle className="w-4 h-4 text-white" />}
+                      {isWrong && <XCircle className="w-4 h-4 text-white" />}
+                      {!isCorrect && !isWrong && isSelected && (
+                        <Circle className="w-4 h-4 text-white" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
@@ -221,7 +223,6 @@ const createPageUrl = (pageName) => {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex justify-between items-center">
           <button
             variant="outline"
@@ -255,7 +256,6 @@ const createPageUrl = (pageName) => {
           </div>
         </div>
 
-        {/* Question Overview */}
         <div className="mt-8 bg-white/50 backdrop-blur-sm rounded-2xl p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Question Overview</h3>
           <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
