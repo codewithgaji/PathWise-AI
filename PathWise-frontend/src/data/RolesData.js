@@ -10,7 +10,7 @@ import {
 
 
 const RolesData = {
-  /* Software Engineering */
+  /* Software Engineering */ //should be computer science
   "tech-product-dev": [
     {
       id: "frontend-engineer",
