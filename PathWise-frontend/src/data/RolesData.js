@@ -11,41 +11,7 @@ import {
 
 const RolesData = {
   /* Software Engineering */ //should be computer science
-  "tech-product-dev": [
-    {
-      id: "frontend-engineer",
-      name: "Frontend Engineer",
-      // icon: Monitor,
-      icon:Heart,
-      description: "Build and optimize user interfaces for web and mobile products",
-      level: "Entry to Senior",
-      avgSalary: "₦300K - ₦2M",
-      demand: "Very High",
-      skills: ["JavaScript", "React", "HTML/CSS", "Accessibility", "Performance Optimization"]
-    },
-    {
-      id: "backend-engineer",
-      name: "Backend Engineer",
-      // icon: Server,
-       icon:Heart,
-      description: "Design and implement server-side logic and APIs",
-      level: "Entry to Senior",
-      avgSalary: "₦350K - ₦2M",
-      demand: "Very High",
-      skills: ["Node.js", "Databases", "API Design", "Authentication", "Scalability"]
-    },
-    {
-      id: "product-engineer",
-      name: "Product Engineer",
-      // icon: Puzzle,
-       icon:Heart,
-      description: "Bridge product requirements and execution; iterate on features",
-      level: "Mid Level",
-      avgSalary: "₦400K - ₦2.2M",
-      demand: "High",
-      skills: ["User Research", "Agile", "Feature Prioritization", "A/B Testing", "Collaboration"]
-    }
-  ],
+ 
   "embedded-systems": [
     {
       id: "firmware-developer",
@@ -323,7 +289,7 @@ const RolesData = {
       skills: ["Health Communication", "Curriculum Design", "Community Outreach", "Cultural Sensitivity", "Public Speaking"]
     }
   ],
-   "tech-companies": [
+  "fintech": [
     {
       id: "frontend-developer",
       name: "Frontend Developer",
@@ -353,10 +319,40 @@ const RolesData = {
       avgSalary: "₦300K - ₦1.4M",
       demand: "High",
       skills: ["react-native", "flutter", "javascript", "ui-design", "api-integration"]
-    }
-  ],
-
-  "fintech": [
+    },
+    {
+      id: "frontend-engineer",
+      name: "Frontend Engineer",
+      // icon: Monitor,
+      icon:Heart,
+      description: "Build and optimize user interfaces for web and mobile products",
+      level: "Entry to Senior",
+      avgSalary: "₦300K - ₦2M",
+      demand: "Very High",
+      skills: ["JavaScript", "React", "HTML/CSS", "Accessibility", "Performance Optimization"]
+    },
+    {
+      id: "backend-engineer",
+      name: "Backend Engineer",
+      // icon: Server,
+       icon:Heart,
+      description: "Design and implement server-side logic and APIs",
+      level: "Entry to Senior",
+      avgSalary: "₦350K - ₦2M",
+      demand: "Very High",
+      skills: ["Node.js", "Databases", "API Design", "Authentication", "Scalability"]
+    },
+    {
+      id: "product-engineer",
+      name: "Product Engineer",
+      // icon: Puzzle,
+       icon:Heart,
+      description: "Bridge product requirements and execution; iterate on features",
+      level: "Mid Level",
+      avgSalary: "₦400K - ₦2.2M",
+      demand: "High",
+      skills: ["User Research", "Agile", "Feature Prioritization", "A/B Testing", "Collaboration"]
+    },
     {
       id: "software-engineer",
       name: "Software Engineer",

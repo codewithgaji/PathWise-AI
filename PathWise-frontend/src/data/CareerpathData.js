@@ -40,16 +40,6 @@ import {
 const  CareerpathData = {
   "Computer Science": [
     {
-      id: "tech-companies",
-      name: "Technology Companies",
-      icon: Smartphone,
-      description: "Work with leading tech firms and startups",
-      jobCount: "2,500+ jobs",
-      salaryRange: "₦200K - ₦2M",
-      growth: "+25% annually",
-      companies: ["Paystack", "Flutterwave", "Interswitch"]
-    },
-    {
       id: "fintech",
       name: "Financial Technology",
       icon: DollarSign,

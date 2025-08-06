@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from 'framer-motion';
 import { ExpandProfile } from "./ExpandProfile";
 import {
   BookOpen,
@@ -40,11 +41,17 @@ export default function Skills() {
       CareerPathPage: "/career-path",
       JobRolePage: "/job-roles",
       Assessment: "/assessment",
-      ResultPage: "/result"
+      ResultPage: "/result",
     }),
     []
   );
 
+    const[isLoading , setIsLoading] = useState(true);
+    useEffect(() => {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 10000);
+    },[]);
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const course = urlParams.get("course") || "Computer Science";
@@ -242,20 +249,24 @@ export default function Skills() {
                           <BookOpen className="w-4 h-4" />
                           Learning Resources
                         </h4>
-                        <div className="grid md:grid-cols-2 gap-3">
-                          {skill.resources.map((resource, resourceIndex) => (
-                            <a
-                              key={resourceIndex}
-                              href={resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-orange-100 transition-colors group"
-                            >
-                              <ExternalLink className="w-4 h-4 text-orange-500 group-hover:text-orange-700" />
-                              <span className="text-sm font-medium text-orange-500">{resource.name}</span>
-                            </a>
-                          ))}
-                        </div>
+                          {isLoading ? (  <div className="flex justify-center items-center h-40">
+                           <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-orange-600"></div> <p className=" text-2xl px-5"> Fetching from Ai</p>
+                            </div>) : (
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {skill.resources.map((resource, resourceIndex) => (
+                              <a
+                                key={resourceIndex}
+                                href={resource.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-orange-100 transition-colors group"
+                              >
+                                <ExternalLink className="w-4 h-4 text-orange-500 group-hover:text-orange-700" />
+                                <span className="text-sm font-medium text-orange-500">{resource.name}</span>
+                              </a>
+                            ))}
+                          </div>
+                          )} 
                       </div>
                     </div>
                   </div>
@@ -296,7 +307,73 @@ export default function Skills() {
             </button>
           )}
         </div>
+        <SkillTracker skills={skills} completedSkills={completedSkills} />
       </div>
     </div>
   );
 }
+
+
+const SkillTracker = ({ skills, completedSkills }) => {
+  const [showCongrats, setShowCongrats] = useState(false);
+  const navigate = useNavigate();
+
+  const completionPercentage =
+    skills.length > 0
+      ? Math.round((completedSkills.size / skills.length) * 100)
+      : 0;
+
+  useEffect(() => {
+    if (completionPercentage === 100) {
+      setShowCongrats(true);
+    }
+  }, [completionPercentage]);
+
+  const handleClose = () => setShowCongrats(false);
+
+  const handleContinue = () => {
+    navigate('/project-page');
+  };
+
+  return (
+    <div className="p-4">
+      <p className="text-lg font-medium">Completion: {completionPercentage}%</p>
+
+      <AnimatePresence>
+        {showCongrats && (
+          <motion.div
+            className="fixed inset-0  backdrop-blur  flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white shadow-2xl rounded-lg items-center flex flex-col justify-center   text-center h-[25em] w-[37em]"
+              initial={{ y: "-100vh", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "-100vh", opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h2 className="text-6xl  font-bold text-green-500 mb-2">🎉Congratulations!</h2>
+              <p className="text-gray-700 font-semibold text-2xl mb-4">You have completed all skills.</p>
+             <div className="flex justify-between gap-30 pt-10">
+              <button
+                className="border-green-600 cursor-pointer border-2 bg-black text-white hover:scale-110 transform  hover:text-white px-4 py-3 rounded-2xl mr-2 transition"
+                onClick={handleContinue}
+              >
+                Continue to Project Page
+              </button>
+              <button
+                className=" border-2 cursor-pointer px-10 rounded-2xl text-sm "
+                onClick={handleClose}
+              >
+                Close
+              </button>
+              </div> 
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};

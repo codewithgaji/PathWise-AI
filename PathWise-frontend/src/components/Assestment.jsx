@@ -26,12 +26,12 @@ export default function Assesment() {
   }, []);
 const createPageUrl = (pageName) => {
   const pageRoutes = {
-    SkillsPage: "/skills",            // or "/career-skills" or your actual path
-    CareerPathPage: "/career-path",   // match this to your <Route path="..." />
-    JobRolePage: "/job-roles",        // match this to your <Route path="..." />
-    Assessment: "/assessment",        // or your actual path for assessment 
-    Result: "/result" ,                // or your actual path for result 
-     TestPage: "/test",              // or your actual path for test
+    SkillsPage: "/skills",          
+    CareerPathPage: "/career-path",   
+    JobRolePage: "/job-roles",       
+    Assessment: "/assessment",       
+    Result: "/result" ,          
+     TestPage: "/test",            
   };
 
   return pageRoutes[pageName] || "/";

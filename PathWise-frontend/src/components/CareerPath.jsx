@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate , useLocation } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { ExpandProfile } from "./ExpandProfile";
 import { 
   Building2, 
@@ -46,9 +47,13 @@ import careerPaths from "../data/CareerpathData";
 export default function CareerPathPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const[isUnlocked, setIsUnlocked] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState("");
   const [paths, setPaths] = useState([]);
-
+  //check if eye is open or not
+    const toggleUnlock = () =>{
+    setIsUnlocked(!isUnlocked);
+    }
   const createPageUrl = (pageName) => {
     const pageRoutes = {
       SkillsPage: "/skills",
@@ -78,7 +83,7 @@ export default function CareerPathPage() {
         `?course=${encodeURIComponent(selectedCourse)}&path=${pathId}`
     );
   };
-
+ 
   return (
     <div className="min-h-screen bg-gray-900 py-12 px-4">
       <div className="px-10">
@@ -116,8 +121,7 @@ export default function CareerPathPage() {
               const IconComponent = path.icon;
               return (
                 <div
-                  key={path.id}
-                  onClick={() => handlePathSelect(path.id)}
+                 
                   className="group bg-white/10 backdrop-blur-xl rounded-3xl shadow-xl border border-green-500 p-8 cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:bg-white/20"
                 >
                   {/* Icon and Header */}
@@ -130,22 +134,33 @@ export default function CareerPathPage() {
                   <p className="text-white text-sm leading-relaxed mb-4">
                     {path.description}
                   </p>
+                  
                   {/* Stats */}
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">Available Jobs</span>
-                      <span className="font-semibold text-orange-500">{path.jobCount}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">Salary Range</span>
-                      <span className="font-semibold text-green-600">{path.salaryRange}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">Growth Rate</span>
-                      <span className="font-semibold text-purple-600">{path.growth}</span>
-                    </div>
-                  </div>
-
+                   <button onClick={toggleUnlock} className="cursor-pointer mb-6 text-orange-500 transition-all">
+                    {isUnlocked ? <Eye size={20} /> : <EyeOff size={20} />}
+                  </button>
+                  {isUnlocked ? 
+                    <div className="space-y-3 mb-6 ">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-white">Available Jobs</span>
+                        <span className="font-semibold text-orange-500">{path.jobCount}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-white">Salary Range</span>
+                        <span className="font-semibold text-green-600">{path.salaryRange}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-white">Growth Rate</span>
+                        <span className="font-semibold text-purple-600">{path.growth}</span>
+                      </div>
+                    </div>: "****"
+                  }
+                 
+                  {!isUnlocked && (
+                      <span className="ml-2 text-sm text-orange-500 mt-5 italic">
+                        Unlock this pro feature
+                      </span>
+                   )}
                   {/* Top Companies */}
                   <div className="mb-6">
                     <p className="text-xs text-white mb-2">TOP COMPANIES</p>
@@ -163,9 +178,12 @@ export default function CareerPathPage() {
                   </div>
 
                   {/* CTA */}
-                  <div className="flex items-center justify-between">
+                  <div  key={path.id}
+                   onClick={() => handlePathSelect(path.id)} className="flex items-center justify-between">
                     <span className="text-sm font-medium text-green-500">Explore Roles</span>
-                    <ArrowRight className="w-5 h-5 text-green-500 group-hover:translate-x-1 transition-transform duration-300" />
+                    <div className="border-2 p-3 rounded-full border-green-500">
+                      <ArrowRight className="w-5 h-5    text-green-500 hover:scale-125 transition-transform duration-300" />
+                     </div>
                   </div>
                 </div>
               );
