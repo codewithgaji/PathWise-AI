@@ -11,6 +11,7 @@ import { Footer } from './components/LandingPage/Footer';
 import Roles from './components/Roles';
 import Skills from './components/Skills';
 import Assestment from './components/Assestment';
+import Project from './components/Projects';
 import Result from './components/Result'; 
 import { useEffect, useRef, useState } from 'react';
 import Test from './components/Test';
@@ -86,6 +87,11 @@ const AnimatedRoutes = () => {
         <Route path="/test" element={
           <AnimatedPageWrapper>
             <Test />
+          </AnimatedPageWrapper>
+        } />
+         <Route path="/project-page" element={
+          <AnimatedPageWrapper> 
+            <Project />
           </AnimatedPageWrapper>
         } />
       </Routes>
