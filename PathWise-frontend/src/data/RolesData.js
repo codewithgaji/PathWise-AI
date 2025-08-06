@@ -289,7 +289,7 @@ const RolesData = {
       skills: ["Health Communication", "Curriculum Design", "Community Outreach", "Cultural Sensitivity", "Public Speaking"]
     }
   ],
-   "tech-companies": [
+  "fintech": [
     {
       id: "frontend-developer",
       name: "Frontend Developer",
@@ -319,10 +319,7 @@ const RolesData = {
       avgSalary: "₦300K - ₦1.4M",
       demand: "High",
       skills: ["react-native", "flutter", "javascript", "ui-design", "api-integration"]
-    }
-  ],
-
-  "fintech": [
+    },
     {
       id: "frontend-engineer",
       name: "Frontend Engineer",

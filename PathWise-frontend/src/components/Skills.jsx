@@ -50,7 +50,7 @@ export default function Skills() {
     useEffect(() => {
       setTimeout(() => {
         setIsLoading(false);
-      }, 5000);
+      }, 10000);
     },[]);
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
