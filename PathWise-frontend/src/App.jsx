@@ -1,33 +1,23 @@
-
 import { BrowserRouter, Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import Home from './pages/Home';
+
+import LandingPage from './pages/LandingPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
+
 import CareerPathPage from './components/CareerPath';
 import { Courselection } from './components/Courselection';
-import { Navbar } from './components/LandingPage/Navbar';
-import { Footer } from './components/LandingPage/Footer';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Roles from './components/Roles';
 import Skills from './components/Skills';
 import Assestment from './components/Assestment';
-import Result from './components/Result'; 
-import { useEffect, useRef, useState } from 'react';
+import Result from './components/Result';
 import Test from './components/Test';
 
-// Layout with navbar and footer
-const MainLayout = () => (
-  <>
-    <Navbar />
-    <AnimatedPageWrapper>
-      <Outlet />
-    </AnimatedPageWrapper>
-    <Footer />
-  </>
-);
-
-// Wrapper that adds animation to pages
+// ✅ Page transition animation wrapper
 const AnimatedPageWrapper = ({ children }) => {
+  const location = useLocation();
   return (
     <motion.div
       key={location.pathname}
@@ -41,7 +31,18 @@ const AnimatedPageWrapper = ({ children }) => {
   );
 };
 
-// Wrap Routes in AnimatePresence
+// ✅ Main layout wrapper with Navbar + Footer
+const MainLayout = () => (
+  <>
+    <Navbar />
+    <AnimatedPageWrapper>
+      <Outlet />
+    </AnimatedPageWrapper>
+    <Footer />
+  </>
+);
+
+// ✅ Route definitions with animated transitions
 const AnimatedRoutes = () => {
   const location = useLocation();
 
@@ -49,50 +50,24 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
         </Route>
-        <Route path="/course-selection" element={
-          <AnimatedPageWrapper>
-            <Courselection />
-          </AnimatedPageWrapper>
-        } />
-        <Route path="/career-path" element={
-          <AnimatedPageWrapper>
-            <CareerPathPage />
-          </AnimatedPageWrapper>
-        } />
-         <Route path="/job-roles" element={
-          <AnimatedPageWrapper>
-            <Roles />
-          </AnimatedPageWrapper>
-        } />
-        <Route path="/skills" element={
-          <AnimatedPageWrapper>
-            <Skills />
-          </AnimatedPageWrapper>
-        } />
-        <Route path="/assessment" element={
-          <AnimatedPageWrapper>
-            <Assestment />
-          </AnimatedPageWrapper>
-        } />
-        <Route path="/result" element={
-          <AnimatedPageWrapper>
-            <Result />
-          </AnimatedPageWrapper>
-        } />
-        <Route path="/test" element={
-          <AnimatedPageWrapper>
-            <Test />
-          </AnimatedPageWrapper>
-        } />
+
+        <Route path="/course-selection" element={<AnimatedPageWrapper><Courselection /></AnimatedPageWrapper>} />
+        <Route path="/career-path" element={<AnimatedPageWrapper><CareerPathPage /></AnimatedPageWrapper>} />
+        <Route path="/job-roles" element={<AnimatedPageWrapper><Roles /></AnimatedPageWrapper>} />
+        <Route path="/skills" element={<AnimatedPageWrapper><Skills /></AnimatedPageWrapper>} />
+        <Route path="/assessment" element={<AnimatedPageWrapper><Assestment /></AnimatedPageWrapper>} />
+        <Route path="/result" element={<AnimatedPageWrapper><Result /></AnimatedPageWrapper>} />
+        <Route path="/test" element={<AnimatedPageWrapper><Test /></AnimatedPageWrapper>} />
       </Routes>
     </AnimatePresence>
   );
 };
 
+// ✅ App Entry
 function App() {
   return (
     <BrowserRouter>
