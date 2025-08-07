@@ -34,6 +34,7 @@ export default function Result() {
   const skillNames = {
     javascript: "JavaScript Fundamentals",
     react: "React Development",
+     htmlNcss: "HTML and CSS",
     nodejs: "Node.js Backend",
     databases: "Database Management",
     git: "Version Control (Git)"

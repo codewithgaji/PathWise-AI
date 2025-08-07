@@ -321,28 +321,6 @@ const RolesData = {
       skills: ["react-native", "flutter", "javascript", "ui-design", "api-integration"]
     },
     {
-      id: "frontend-engineer",
-      name: "Frontend Engineer",
-      // icon: Monitor,
-      icon:Heart,
-      description: "Build and optimize user interfaces for web and mobile products",
-      level: "Entry to Senior",
-      avgSalary: "₦300K - ₦2M",
-      demand: "Very High",
-      skills: ["JavaScript", "React", "HTML/CSS", "Accessibility", "Performance Optimization"]
-    },
-    {
-      id: "backend-engineer",
-      name: "Backend Engineer",
-      // icon: Server,
-       icon:Heart,
-      description: "Design and implement server-side logic and APIs",
-      level: "Entry to Senior",
-      avgSalary: "₦350K - ₦2M",
-      demand: "Very High",
-      skills: ["Node.js", "Databases", "API Design", "Authentication", "Scalability"]
-    },
-    {
       id: "product-engineer",
       name: "Product Engineer",
       // icon: Puzzle,

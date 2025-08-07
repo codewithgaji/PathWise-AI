@@ -156,7 +156,6 @@ export default function Skills() {
           <p className="text-lg text-zinc-300 max-w-3xl mx-auto leading-relaxed mb-8">
             Master these essential skills to become job-ready. Track your progress and test your knowledge.
           </p>
-
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-xl border border-green-100 p-8 mb-12">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-white">Learning Progress</h3>

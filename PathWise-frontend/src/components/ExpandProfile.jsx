@@ -36,13 +36,13 @@ export const ExpandProfile = () => {
             animate={{ width: 300, height: 200, opacity: 1 }}
             exit={{ width: 0, height: 0, opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute top-45  -translate-x-1/2 -translate-y-1/3 bg-white border-4 border-orange-500 shadow-lg rounded-lg p-4 overflow-hidden"
+            className="absolute top-45 z-50  -translate-x-1/2 -translate-y-1/3 bg-green-500 border-2 border-orange-500 shadow-lg rounded-lg p-4 overflow-hidden"
           >
             <h2 className="text-xl text-black font-bold">Omilabu Elizabeth</h2>
             <p className="mt-2 text-lg text-black">
-              🎓 Course Selected : Computer science
+            <span className='font-semibold'>  🎓 Course Selected : </span>Computer science
             </p>
-            <button className='mt-2 rounded-3xl cursor-pointer border-4 border-orange-500 hover:bg-orange-500 hover:text-white transition transform w-full px-6 py-4'>Log out</button>
+            <button className='mt-2 rounded-3xl cursor-pointer border-2 bg-black border-orange-500 hover:bg-orange-500 hover:text-white text-orange-500 font-bold transition transform w-full px-6 py-4'>Log out</button>
           </motion.div>
         )}
       </AnimatePresence>
