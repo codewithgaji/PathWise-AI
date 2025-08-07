@@ -1,0 +1,2 @@
+[aiq.components]
+pathwise = pathwise.register
