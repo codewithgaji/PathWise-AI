@@ -269,12 +269,13 @@ const HowItWorks = () => {
             <p className="text-gray-300 mb-8 text-lg max-w-2xl mx-auto">
               Get personalized career guidance in minutes. Free to start, easy to use.
             </p>
+            <a href="/auth">
             <button 
               className="px-8 py-4 rounded-lg text-white font-semibold text-lg hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
               style={{ background: '#00a73e' }}
             >
               Sign Up Now
-            </button>
+            </button></a>
           </div>
         </div>
       </div>
