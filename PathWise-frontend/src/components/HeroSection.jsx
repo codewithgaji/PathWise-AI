@@ -73,9 +73,9 @@ const HeroSection = () => {
           e.target.style.boxShadow = 'none';
         }}
       >
-        <span className="relative z-10">
+        <a href="/auth"><span className="relative z-10">
           Get Started
-        </span>
+        </span></a>
       </button>
 
       {/* PNG Image */}
