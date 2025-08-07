@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple CORS proxy server to test your delivery agent
+Simple CORS proxy server to test PathwiseAgent
 Run this on port 3001 to proxy requests to your agent on port 8000
 """
 from flask import Flask, request, jsonify, Response
