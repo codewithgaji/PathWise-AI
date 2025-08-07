@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import LandingPage from './pages/LandingPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import AuthPages from './components/auth/AuthPages';
 
 import CareerPathPage from './components/CareerPath';
 import { Courselection } from './components/Courselection';
@@ -14,6 +15,7 @@ import Skills from './components/Skills';
 import Assestment from './components/Assestment';
 import Result from './components/Result';
 import Test from './components/Test';
+import Project from './components/Projects';
 
 // ✅ Page transition animation wrapper
 const AnimatedPageWrapper = ({ children }) => {
@@ -49,12 +51,17 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        {/* ✅ Routes using Navbar + Footer */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
         </Route>
 
+        {/* ✅ Route WITHOUT Navbar + Footer */}
+        <Route path="/auth" element={<AnimatedPageWrapper><AuthPages /></AnimatedPageWrapper>} />
+
+        {/* ✅ Other routes also WITHOUT Navbar + Footer */}
         <Route path="/course-selection" element={<AnimatedPageWrapper><Courselection /></AnimatedPageWrapper>} />
         <Route path="/career-path" element={<AnimatedPageWrapper><CareerPathPage /></AnimatedPageWrapper>} />
         <Route path="/job-roles" element={<AnimatedPageWrapper><Roles /></AnimatedPageWrapper>} />
@@ -62,6 +69,7 @@ const AnimatedRoutes = () => {
         <Route path="/assessment" element={<AnimatedPageWrapper><Assestment /></AnimatedPageWrapper>} />
         <Route path="/result" element={<AnimatedPageWrapper><Result /></AnimatedPageWrapper>} />
         <Route path="/test" element={<AnimatedPageWrapper><Test /></AnimatedPageWrapper>} />
+        <Route path="/project-page" element={<AnimatedPageWrapper><Project /></AnimatedPageWrapper>} />
       </Routes>
     </AnimatePresence>
   );

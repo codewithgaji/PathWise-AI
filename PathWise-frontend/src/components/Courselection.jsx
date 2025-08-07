@@ -181,9 +181,3 @@ const navigate = useNavigate();
     </div>
   );
 };
-
-
-
-
-
-
