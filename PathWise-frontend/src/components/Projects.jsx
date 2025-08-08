@@ -21,7 +21,11 @@ import {
   ImageIcon,
   ChevronRight,
   Users,
-  Briefcase
+  Briefcase,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 
 // Helper function to enhance level data with UI properties
@@ -62,8 +66,219 @@ export default function ProjectStage() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedProjectForWork, setSelectedProjectForWork] = useState(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
+  
+  // AI Code Validation States
+  const [userCode, setUserCode] = useState('');
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
+  const [validationResult, setValidationResult] = useState(null);
+  const [validationError, setValidationError] = useState(null);
 
-  // Utility functions
+  // API Configuration (same as Skillsnew.jsx)
+  const API_BASE_URL = 'http://localhost:3001/api';
+
+  // AI Code Validation Functions
+  const validateCodeWithAI = async (code, project) => {
+    setIsValidatingCode(true);
+    setValidationResult(null);
+    setValidationError(null);
+
+    try {
+      // Construct detailed validation prompt
+      const validationPrompt = `You are an expert code reviewer and validator. Please analyze the following code submission for a ${project.difficulty} level project.
+
+PROJECT DETAILS:
+- Title: ${project.title}
+- Description: ${project.description}
+- Technologies Required: ${project.technologies.join(', ')}
+- Learning Objectives: ${project.objectives?.join(', ') || 'Not specified'}
+
+USER'S CODE SUBMISSION:
+\`\`\`
+${code}
+\`\`\`
+
+VALIDATION REQUIREMENTS:
+Please provide a comprehensive code review and validation in JSON format with the following structure:
+
+{
+  "isValid": boolean,
+  "score": number (0-100),
+  "feedback": {
+    "overall": "Overall assessment of the code",
+    "strengths": ["Array of positive aspects"],
+    "improvements": ["Array of areas for improvement"],
+    "errors": ["Array of critical errors if any"],
+    "suggestions": ["Array of helpful suggestions"]
+  },
+  "technicalAnalysis": {
+    "correctness": "Assessment of code correctness",
+    "bestPractices": "Assessment of coding best practices",
+    "completeness": "Assessment of feature completeness",
+    "codeQuality": "Assessment of code quality and structure"
+  },
+  "passed": boolean,
+  "nextSteps": "Recommendations for next steps"
+}
+
+IMPORTANT VALIDATION CRITERIA:
+1. Does the code meet the project requirements?
+2. Are the required technologies used correctly?
+3. Does it fulfill the learning objectives?
+4. Is the code syntactically correct?
+5. Does it follow best practices for the technologies used?
+6. Is the code complete and functional?
+7. Are there any security concerns or bugs?
+
+Be thorough but constructive in your feedback. If the code passes basic requirements, mark it as valid even if there are minor improvements to suggest.`;
+
+      // Make API call using the same pattern as Skillsnew.jsx
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: validationPrompt }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      let botResponse = '';
+      
+      // Parse response using the same pattern as Skillsnew.jsx
+      if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+        botResponse = data.choices[0].message.content;
+      } else if (data.response) {
+        botResponse = data.response;
+      } else if (data.output) {
+        botResponse = data.output;
+      } else if (data.value) {
+        botResponse = data.value;
+      } else if (typeof data === 'string') {
+        botResponse = data;
+      } else {
+        botResponse = 'No validation response received from AI';
+      }
+
+      // Parse the AI validation response
+      const validation = parseValidationResponse(botResponse);
+      setValidationResult(validation);
+
+    } catch (error) {
+      console.error('Error validating code with AI:', error);
+      
+      // Try fallback endpoint
+      try {
+        const fallbackPrompt = `Review this code for a ${project.title} project. Code: ${code}. Please provide feedback on correctness and suggestions for improvement.`;
+        
+        const fallbackResponse = await fetch(`${API_BASE_URL}/generate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ input_message: fallbackPrompt })
+        });
+
+        if (!fallbackResponse.ok) {
+          throw new Error(`HTTP ${fallbackResponse.status}: ${fallbackResponse.statusText}`);
+        }
+
+        const fallbackData = await fallbackResponse.json();
+        const fallbackText = fallbackData.value || fallbackData.response || fallbackData.output || 'Validation service unavailable';
+        
+        const validation = parseValidationResponse(fallbackText);
+        setValidationResult(validation);
+
+      } catch (fallbackError) {
+        setValidationError(`Code validation failed: ${error.message}`);
+      }
+    } finally {
+      setIsValidatingCode(false);
+    }
+  };
+
+  // Parse AI validation response
+  const parseValidationResponse = (aiResponse) => {
+    try {
+      // Try to extract JSON from the response
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return parsed;
+      }
+
+      // Fallback: Create basic validation from text response
+      const isPositive = /good|correct|valid|well|excellent|great|pass/i.test(aiResponse);
+      const hasErrors = /error|wrong|incorrect|fail|issue|problem/i.test(aiResponse);
+
+      return {
+        isValid: isPositive && !hasErrors,
+        score: isPositive ? (hasErrors ? 65 : 85) : 45,
+        feedback: {
+          overall: aiResponse.substring(0, 200) + '...',
+          strengths: isPositive ? ['Code shows good understanding'] : [],
+          improvements: hasErrors ? ['Please review the feedback and make corrections'] : [],
+          errors: hasErrors ? ['Some issues were identified in the code'] : [],
+          suggestions: ['Continue practicing and refining your code']
+        },
+        technicalAnalysis: {
+          correctness: isPositive ? 'Generally correct' : 'Needs improvement',
+          bestPractices: 'Review recommended',
+          completeness: 'Partial assessment',
+          codeQuality: isPositive ? 'Acceptable' : 'Needs work'
+        },
+        passed: isPositive && !hasErrors,
+        nextSteps: isPositive ? 'Great work! Continue to the next project.' : 'Please review the feedback and try again.'
+      };
+    } catch (error) {
+      console.error('Error parsing validation response:', error);
+      return {
+        isValid: false,
+        score: 0,
+        feedback: {
+          overall: 'Unable to validate code properly. Please check your code and try again.',
+          strengths: [],
+          improvements: ['Code validation encountered an error'],
+          errors: ['Validation service error'],
+          suggestions: ['Please try submitting again or check your code syntax']
+        },
+        technicalAnalysis: {
+          correctness: 'Unable to assess',
+          bestPractices: 'Unable to assess',
+          completeness: 'Unable to assess',
+          codeQuality: 'Unable to assess'
+        },
+        passed: false,
+        nextSteps: 'Please try validating your code again.'
+      };
+    }
+  };
+
+  // Handle code testing
+  const handleTestCode = () => {
+    if (!userCode.trim()) {
+      setValidationError('Please write some code before testing.');
+      return;
+    }
+    validateCodeWithAI(userCode, selectedProjectForWork);
+  };
+
+  // Handle code submission and project completion
+  const handleSubmitCode = () => {
+    if (validationResult && validationResult.passed) {
+      handleProjectComplete();
+    } else {
+      setValidationError('Please fix the issues in your code before submitting.');
+    }
+  };
+
+  // Utility functions (keeping existing ones)
   const toggleProjectCompletion = (levelKey, projectId) => {
     setProjectData(prev => {
       const updatedLevel = { ...prev[levelKey] };
@@ -121,6 +336,10 @@ export default function ProjectStage() {
       setSelectedProjectForWork(selectedProject);
       setCurrentView('workspace');
       setShowProjectModal(false);
+      // Reset workspace state
+      setUserCode('');
+      setValidationResult(null);
+      setValidationError(null);
     }
   };
 
@@ -130,11 +349,17 @@ export default function ProjectStage() {
     }
     setCurrentView('projects');
     setSelectedProjectForWork(null);
+    setUserCode('');
+    setValidationResult(null);
+    setValidationError(null);
   };
 
   const handleBackToProjects = () => {
     setCurrentView('projects');
     setSelectedProjectForWork(null);
+    setUserCode('');
+    setValidationResult(null);
+    setValidationError(null);
   };
 
   // Component definitions
@@ -225,7 +450,7 @@ export default function ProjectStage() {
               </button>
               <button
                 onClick={handleStartProject}
-                className="flex-1 px-4 py-3  bg-green-500 text-white rounded-lg hover:scale-105 cursor-pointer transition-all flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-green-500 text-white rounded-lg hover:scale-105 cursor-pointer transition-all flex items-center justify-center gap-2"
               >
                 <Play className="w-4 h-4" />
                 Start Project
@@ -248,7 +473,7 @@ export default function ProjectStage() {
                 onClick={handleBackToProjects}
                 className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-5 h-5 rotate-180" />
               </button>
               <div>
                 <h1 className="text-xl font-bold text-white">{selectedProjectForWork.title}</h1>
@@ -264,13 +489,23 @@ export default function ProjectStage() {
                 </div>
               </div>
             </div>
-            <button
-              onClick={handleProjectComplete}
-              className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              Mark Complete
-            </button>
+            <div className="flex items-center gap-3">
+              {validationResult && validationResult.passed && (
+                <button
+                  onClick={handleSubmitCode}
+                  className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Submit Project
+                </button>
+              )}
+              <button
+                onClick={() => setValidationResult(null)}
+                className="px-6 py-3 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -280,7 +515,7 @@ export default function ProjectStage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Instructions */}
-            <div className="bg-white/5   rounded-3xl p-6 border border-green-700">
+            <div className="bg-white/5 rounded-3xl p-6 border border-green-700">
               <h2 className="text-xl font-bold text-white mb-4">Project Instructions</h2>
               <div className="space-y-4">
                 <div className="bg-gray-700/50 rounded-lg p-4">
@@ -314,7 +549,7 @@ export default function ProjectStage() {
             </div>
 
             {/* Code Editor Area */}
-            <div className="bg-white/5   rounded-3xl p-6 border border-green-700 overflow-hidden">
+            <div className="bg-white/5 rounded-3xl border border-green-700 overflow-hidden">
               <div className="bg-gray-700/50 px-4 py-3 border-b border-gray-600">
                 <div className="flex items-center gap-2">
                   <Code className="w-5 h-5 text-gray-400" />
@@ -324,6 +559,8 @@ export default function ProjectStage() {
               
               <div className="p-4">
                 <textarea
+                  value={userCode}
+                  onChange={(e) => setUserCode(e.target.value)}
                   placeholder="Start writing your code here..."
                   className="w-full h-96 bg-gray-900 text-gray-100 font-mono text-sm border border-gray-600 rounded-lg p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   style={{ fontFamily: 'Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}
@@ -332,25 +569,160 @@ export default function ProjectStage() {
 
               <div className="bg-gray-700/50 px-4 py-3 border-t border-gray-600">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">AI will validate your code when you submit</span>
-                  <button className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
-                    Test Code
+                  <span className="text-sm text-gray-400">
+                    {isValidatingCode ? 'AI is validating your code...' : 'AI will validate your code when you test it'}
+                  </span>
+                  <button 
+                    onClick={handleTestCode}
+                    disabled={isValidatingCode || !userCode.trim()}
+                    className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isValidatingCode ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Validating...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        Test Code
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* AI Validation Results */}
+          {(validationResult || validationError) && (
+            <div className="mt-8">
+              <div className="bg-white/5 rounded-3xl p-6 border border-green-700">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  🤖 AI Code Validation Results
+                  {validationResult?.passed && <CheckCircle className="w-5 h-5 text-green-400" />}
+                  {validationResult && !validationResult.passed && <XCircle className="w-5 h-5 text-red-400" />}
+                </h3>
+                
+                {validationError ? (
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-red-400 mb-2">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="font-semibold">Validation Error</span>
+                    </div>
+                    <p className="text-red-300 text-sm">{validationError}</p>
+                  </div>
+                ) : validationResult ? (
+                  <div className="space-y-4">
+                    {/* Score and Overall Status */}
+                    <div className={`p-4 rounded-lg border ${
+                      validationResult.passed 
+                        ? 'bg-green-500/10 border-green-500/30' 
+                        : 'bg-yellow-500/10 border-yellow-500/30'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`font-semibold ${
+                          validationResult.passed ? 'text-green-400' : 'text-yellow-400'
+                        }`}>
+                          {validationResult.passed ? '✅ Code Validation Passed!' : '⚠️ Code Needs Improvement'}
+                        </span>
+                        <span className="text-white font-bold text-lg">
+                          Score: {validationResult.score}/100
+                        </span>
+                      </div>
+                      <p className={`text-sm ${
+                        validationResult.passed ? 'text-green-300' : 'text-yellow-300'
+                      }`}>
+                        {validationResult.feedback.overall}
+                      </p>
+                    </div>
+
+                    {/* Detailed Feedback */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Strengths */}
+                      {validationResult.feedback.strengths.length > 0 && (
+                        <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-green-400 mb-2 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" />
+                            Strengths
+                          </h4>
+                          <ul className="space-y-1">
+                            {validationResult.feedback.strengths.map((strength, index) => (
+                              <li key={index} className="text-green-300 text-sm">• {strength}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Improvements */}
+                      {validationResult.feedback.improvements.length > 0 && (
+                        <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-blue-400 mb-2 flex items-center gap-2">
+                            <Target className="w-4 h-4" />
+                            Areas for Improvement
+                          </h4>
+                          <ul className="space-y-1">
+                            {validationResult.feedback.improvements.map((improvement, index) => (
+                              <li key={index} className="text-blue-300 text-sm">• {improvement}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Errors */}
+                      {validationResult.feedback.errors.length > 0 && (
+                        <div className="bg-red-500/5 border border-red-500/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-red-400 mb-2 flex items-center gap-2">
+                            <XCircle className="w-4 h-4" />
+                            Critical Issues
+                          </h4>
+                          <ul className="space-y-1">
+                            {validationResult.feedback.errors.map((error, index) => (
+                              <li key={index} className="text-red-300 text-sm">• {error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Suggestions */}
+                      {validationResult.feedback.suggestions.length > 0 && (
+                        <div className="bg-purple-500/5 border border-purple-500/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-purple-400 mb-2 flex items-center gap-2">
+                            <Star className="w-4 h-4" />
+                            Suggestions
+                          </h4>
+                          <ul className="space-y-1">
+                            {validationResult.feedback.suggestions.map((suggestion, index) => (
+                              <li key={index} className="text-purple-300 text-sm">• {suggestion}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Next Steps */}
+                    <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                      <h4 className="font-semibold text-gray-300 mb-2">Next Steps</h4>
+                      <p className="text-gray-400 text-sm">{validationResult.nextSteps}</p>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          )}
+
           {/* Project Preview */}
           {selectedProjectForWork.hasVisual && (
             <div className="mt-8">
-              <div className="bg-white/5   rounded-3xl p-6 border border-green-700">
-                <h3 className="text-lg font-bold text-white mb-4">Expected Output</h3>
-                <div className="bg-white/70 rounded-lg h-64 flex items-center justify-center">
-                  <div className="text-center text-black">
-                    <Monitor className="w-12 h-12 mx-auto mb-2" />
-                    <p className="text-sm">Project preview will appear here</p>
-                    <p className="text-xs text-black mt-1">This shows how your {selectedProjectForWork.title} should look</p>
+              <div className="bg-white/5 rounded-3xl p-6 border border-green-700">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <Monitor className="w-5 h-5" />
+                  Project Preview
+                </h3>
+                <div className="bg-gray-900 rounded-lg p-8 border border-gray-700">
+                  <div className="text-center text-gray-500">
+                    <ImageIcon className="w-12 h-12 mx-auto mb-2" />
+                    <p className="text-sm">Your project output will appear here when you run the code</p>
                   </div>
                 </div>
               </div>
@@ -363,241 +735,281 @@ export default function ProjectStage() {
 
   const ProjectsView = () => {
     const currentLevelData = projectData[currentLevel];
-    const IconComponent = currentLevelData?.icon;
     const progress = getLevelProgress(currentLevel);
+    const nextLevel = getNextLevel();
 
     return (
-      <div className="min-h-screen  bg-gray-900">
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          <div className="flex justify-between items-center mb-12">
-              <h1 className="text-2xl font-bold text-white">PATHWISE AI</h1>
-              <ExpandProfile />
-           </div>
-          {/* Role Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            className="text-center mb-8"
-          >
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 bg-green-500/20 rounded-xl">
-                <Briefcase className="w-8 h-8 text-green-500" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+        <div className="container mx-auto max-w-7xl">
+          {/* Header with role info and overall progress */}
+          <div className="mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Frontend Developer Projects
+                </h1>
+                <p className="text-gray-600">
+                  Build real-world projects to master frontend development
+                </p>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white">
-                Master <span className="text-green-500">
-                  {projectData.roleName}
-                </span>
-              </h1>
-            </div>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-6">
-              {projectData.roleDescription}
-            </p>
-            
-            {/* Overall Progress */}
-            <div className="max-w-md mx-auto bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-white">Overall Progress</span>
-                <span className="text-sm font-medium text-gray-300">{overallCompleted}/{overallTotal} Projects</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-3 mb-3">
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-orange-500 h-3 rounded-full transition-all duration-300"
-                  style={{ width: `${overallPercentage}%` }}
-                />
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <Trophy className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm text-gray-300">
-                  {Math.round(overallPercentage)}% Complete
-                </span>
+              
+              <div className="flex items-center gap-6">
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">Overall Progress</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${overallPercentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700">
+                      {overallCompleted}/{overallTotal}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <Trophy className="w-8 h-8 mx-auto text-yellow-500 mb-1" />
+                  <p className="text-xs text-gray-600">
+                    {Math.round(overallPercentage)}% Complete
+                  </p>
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Level Navigation */}
-          <div className="flex justify-center mb-8">
-            <div className="flex bg-white/5 backdrop-blur-sm rounded-3xl p-2">
-              {levelKeys.map((level, index) => (
-                <button
-                  key={level}
-                  onClick={() => canAccessLevel(level) && setCurrentLevel(level)}
-                  disabled={!canAccessLevel(level)}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
-                    currentLevel === level
-                      ? 'bg-white text-gray-900 shadow-lg'
-                      : canAccessLevel(level)
-                      ? 'text-white hover:bg-white/10'
-                      : 'text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {!canAccessLevel(level) && <Lock className="w-4 h-4" />}
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
-                  {getLevelProgress(level).percentage === 100 && (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  )}
-                </button>
-              ))}
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2 p-2 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
+              {levelKeys.map((levelKey) => {
+                const levelData = projectData[levelKey];
+                const levelProgress = getLevelProgress(levelKey);
+                const canAccess = canAccessLevel(levelKey);
+                const IconComponent = levelData.icon;
+
+                return (
+                  <button
+                    key={levelKey}
+                    onClick={() => canAccess && setCurrentLevel(levelKey)}
+                    disabled={!canAccess}
+                    className={`
+                      flex-1 min-w-[200px] p-4 rounded-xl font-medium transition-all duration-200
+                      ${currentLevel === levelKey
+                        ? `${levelData.bgColor} ${levelData.textColor} ${levelData.borderColor} border-2 shadow-md`
+                        : canAccess
+                        ? 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {canAccess ? (
+                          <IconComponent className="w-5 h-5" />
+                        ) : (
+                          <Lock className="w-5 h-5" />
+                        )}
+                        <span className="capitalize font-semibold">{levelKey}</span>
+                      </div>
+                      {levelProgress.percentage === 100 && (
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      )}
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span>{levelProgress.completed}/{levelProgress.total} completed</span>
+                        <span>{Math.round(levelProgress.percentage)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className={`bg-gradient-to-r ${levelData.color} h-1.5 rounded-full transition-all duration-300`}
+                          style={{ width: `${levelProgress.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Current Level Content */}
-          <motion.div
-            key={currentLevel}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 overflow-hidden">
-              <div className={`p-8 ${currentLevelData.bgColor}/10`}>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-4 ${currentLevelData.bgColor} rounded-2xl`}>
-                      <IconComponent className={`w-8 h-8 ${currentLevelData.textColor}`} />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold text-white mb-2">{currentLevelData.title}</h2>
-                      <p className="text-gray-300">{currentLevelData.description}</p>
-                    </div>
+          <div className="grid gap-8">
+            {/* Level Header */}
+            <div className={`${currentLevelData.bgColor} rounded-3xl p-8 border-2 ${currentLevelData.borderColor}`}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className={`p-4 bg-gradient-to-r ${currentLevelData.color} rounded-2xl text-white`}>
+                    <currentLevelData.icon className="w-8 h-8" />
                   </div>
-                  <Badge variant="outline" className="text-white border-white/30">
-                    {progress.completed}/{progress.total} Complete
-                  </Badge>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-300">Level Progress</span>
-                    <span className="text-sm font-medium text-white">{Math.round(progress.percentage)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-3">
-                    <div 
-                      className={`bg-gradient-to-r ${currentLevelData.color} h-3 rounded-full transition-all duration-300`}
-                      style={{ width: `${progress.percentage}%` }}
-                    />
+                  <div>
+                    <h2 className={`text-3xl font-bold ${currentLevelData.textColor} capitalize`}>
+                      {currentLevel} Level
+                    </h2>
+                    <p className={`${currentLevelData.textColor}/80`}>
+                      {currentLevelData.description}
+                    </p>
                   </div>
                 </div>
-
-                {/* Projects */}
-                <div className="space-y-4">
-                  {currentLevelData.projects.map((project, index) => (
-                    <motion.div
-                      key={project.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 transition-all duration-200 cursor-pointer group"
-                      onClick={() => handleProjectClick(project)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-start gap-4 flex-1">
-                          <div className="flex-shrink-0 mt-1">
-                            {project.completed ? (
-                              <CheckCircle2 className="w-6 h-6 text-green-500" />
-                            ) : (
-                              <div className="w-6 h-6 rounded-full border-2 border-gray-400" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-xl font-semibold text-white group-hover:text-orange-500 transition-colors">
-                                {project.title}
-                              </h3>
-                              <Badge variant="outline" className="text-xs text-gray-300 border-gray-500">
-                                {project.difficulty}
-                              </Badge>
-                            </div>
-                            <p className="text-gray-300 mb-3 leading-relaxed">{project.description}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-400">
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                <span>{project.duration}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Code className="w-4 h-4" />
-                                <span>{project.technologies.join(', ')}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-                      </div>
-                    </motion.div>
-                  ))}
+                
+                <div className="text-right">
+                  <div className={`text-2xl font-bold ${currentLevelData.textColor}`}>
+                    {progress.completed}/{progress.total}
+                  </div>
+                  <p className={`text-sm ${currentLevelData.textColor}/70`}>
+                    Projects Completed
+                  </p>
                 </div>
-
-                {/* Level Completion/Next Level Button */}
-                {isCurrentLevelComplete() && getNextLevel() && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-8 text-center"
-                  >
-                    <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-2xl p-6 border border-green-500/30">
-                      <div className="flex items-center justify-center gap-2 mb-4">
-                        <Trophy className="w-6 h-6 text-yellow-400" />
-                        <span className="text-lg font-semibold text-white">Level Complete!</span>
-                      </div>
-                      <p className="text-gray-300 mb-6">
-                        Congratulations! You've completed all {currentLevel} projects. Ready for the next challenge?
-                      </p>
-                      <button
-                        onClick={() => setCurrentLevel(getNextLevel())}
-                        className="px-8 py-4 bg-gradient-to-r from-green-600 to-emrald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-500 transition-all duration-200 flex items-center justify-center gap-2 mx-auto"
-                      >
-                        Advance to {getNextLevel().charAt(0).toUpperCase() + getNextLevel().slice(1)} Level
-                        <ArrowRight className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Certificate Section */}
-                {currentLevel === 'advanced' && isCurrentLevelComplete() && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-8"
-                  >
-                    <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl p-8 border border-amber-500/30 text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Award className="w-10 h-10 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white mb-4">Congratulations! 🎉</h3>
-                      <p className="text-gray-300 mb-6 max-w-md mx-auto">
-                        You've successfully completed all projects for {projectData.roleName}. 
-                        Download your certificate to showcase your achievement.
-                      </p>
-                      <button className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-200 flex items-center justify-center gap-2 mx-auto">
-                        <Award className="w-5 h-5" />
-                        Download Certificate
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
               </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className={currentLevelData.textColor}>Progress</span>
+                  <span className={currentLevelData.textColor}>
+                    {Math.round(progress.percentage)}%
+                  </span>
+                </div>
+                <div className="w-full bg-white/50 rounded-full h-3">
+                  <div
+                    className={`bg-gradient-to-r ${currentLevelData.color} h-3 rounded-full transition-all duration-500`}
+                    style={{ width: `${progress.percentage}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Level Completion Message */}
+              {isCurrentLevelComplete() && nextLevel && (
+                <div className="mt-6 p-4 bg-white/70 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Award className="w-6 h-6 text-yellow-600" />
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          Congratulations! Level Complete
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          You can now unlock the {nextLevel} level
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setCurrentLevel(nextLevel)}
+                      className="px-4 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:scale-105 transition-all flex items-center gap-2"
+                    >
+                      Unlock {nextLevel}
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          </motion.div>
+
+            {/* Projects Grid */}
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {currentLevelData.projects.map((project) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                  onClick={() => handleProjectClick(project)}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                        {project.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm line-clamp-2">
+                        {project.description}
+                      </p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0">
+                      {project.completed ? (
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-white" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 border-2 border-gray-300 rounded-full group-hover:border-blue-400 transition-colors" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Clock className="w-4 h-4" />
+                        {project.duration}
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Users className="w-4 h-4" />
+                        {project.difficulty}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1">
+                      {project.technologies?.slice(0, 3).map((tech, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {project.technologies?.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                          +{project.technologies.length - 3} more
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700">
+                          {project.completed ? 'Completed' : 'Start Project'}
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* No Projects Message */}
+            {currentLevelData.projects.length === 0 && (
+              <div className="text-center py-12">
+                <Briefcase className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                  No projects available
+                </h3>
+                <p className="text-gray-500">
+                  Projects for this level are coming soon!
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   };
 
-  // Main render logic
-  if (currentView === 'workspace' && selectedProjectForWork) {
-    return <WorkspaceView />;
-  }
-
+  // Main render
   return (
-    <>
-      <ProjectsView />
+    <div>
+      <AnimatePresence mode="wait">
+        {currentView === 'projects' && <ProjectsView />}
+        {currentView === 'workspace' && <WorkspaceView />}
+      </AnimatePresence>
+
       <AnimatePresence>
         {showProjectModal && selectedProject && <ProjectModal />}
       </AnimatePresence>
-    </>
+
+      <ExpandProfile />
+    </div>
   );
 }
-
-
-
-

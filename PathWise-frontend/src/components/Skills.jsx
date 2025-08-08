@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,7 +9,10 @@ import {
   Circle,
   ArrowRight,
   Clock,
-  Trophy
+  Trophy,
+  Loader2,
+  AlertCircle,
+  Video
 } from "lucide-react";
 import skillsData from "../data/SkillsData";
 
@@ -34,6 +36,13 @@ export default function Skills() {
   const [selectedRole, setSelectedRole] = useState("");
   const [skills, setSkills] = useState([]);
   const [completedSkills, setCompletedSkills] = useState(new Set());
+  
+  // AI API related states
+  const [skillResources, setSkillResources] = useState({});
+  const [loadingResources, setLoadingResources] = useState({});
+  const [resourceErrors, setResourceErrors] = useState({});
+
+  const API_BASE_URL = 'http://localhost:3001/api'; // Same as DeliveryAss.jsx and Skillsnew.jsx
 
   const pageRoutes = useMemo(
     () => ({
@@ -46,12 +55,6 @@ export default function Skills() {
     []
   );
 
-    const[isLoading , setIsLoading] = useState(true);
-    useEffect(() => {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 10000);
-    },[]);
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const course = urlParams.get("course") || "Computer Science";
@@ -94,6 +97,216 @@ export default function Skills() {
     } catch {}
   }, [completedSkills, selectedCourse, selectedPath, selectedRole]);
 
+  // AI API Functions (adapted from Skillsnew.jsx)
+  const fetchResourcesForSkill = async (skillId, skillName) => {
+    setLoadingResources(prev => ({ ...prev, [skillId]: true }));
+    setResourceErrors(prev => ({ ...prev, [skillId]: null }));
+
+    try {
+      // Construct the prompt for your AI agent
+      const message = `Find REAL, EXISTING learning resources for the skill: "${skillName}". 
+
+CRITICAL: Only provide URLs that you know actually exist. Do NOT generate fake or placeholder URLs.
+
+Please provide exactly:
+1. One high-quality online resource (course, article, or guide) with REAL title and REAL URL
+2. One YouTube video tutorial with REAL title and REAL URL from an actual channel
+
+If you're not certain about specific URLs, use well-known educational platforms like:
+- For resources: MDN, W3Schools, freeCodeCamp, Khan Academy, Coursera, edX
+- For videos: Channels like Traversy Media, Programming with Mosh, Academind, Net Ninja
+
+Focus on practical, beginner-friendly resources that can help someone learn this specific skill. 
+Format the response as JSON with this structure:
+{
+  "resource": {
+    "title": "Actual Resource Title",
+    "url": "https://actual-working-url.com",
+    "type": "course/article/guide"
+  },
+  "video": {
+    "title": "Actual Video Title", 
+    "url": "https://youtube.com/watch?v=REAL_VIDEO_ID",
+    "channel": "Real Channel Name"
+  }
+}
+
+IMPORTANT: If you cannot provide real URLs, respond with null values instead of fake ones.`;
+
+      // Use the same pattern as DeliveryAss.jsx
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: message }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      let botResponse = '';
+      
+      // Parse response using the same pattern as DeliveryAss.jsx
+      if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+        botResponse = data.choices[0].message.content;
+      } else if (data.response) {
+        botResponse = data.response;
+      } else if (data.output) {
+        botResponse = data.output;
+      } else if (data.value) {
+        botResponse = data.value;
+      } else if (typeof data === 'string') {
+        botResponse = data;
+      } else {
+        botResponse = 'No response content received from agent';
+      }
+
+      // Parse the AI response to extract resource information
+      const resources = parseResourcesFromResponse(botResponse);
+      
+      // If AI resources are invalid, try fallback
+      if ((!resources.resource || !resources.video) && !resources.resource?.url && !resources.video?.url) {
+        const fallback = getFallbackResources(skillName);
+        if (fallback) {
+          console.log(`Using fallback resources for ${skillName}`);
+          setSkillResources(prev => ({
+            ...prev,
+            [skillId]: fallback
+          }));
+          return;
+        }
+      }
+      
+      setSkillResources(prev => ({
+        ...prev,
+        [skillId]: resources
+      }));
+
+    } catch (error) {
+      console.error(`Error fetching resources for ${skillName}:`, error);
+      
+      // Try fallback endpoint like DeliveryAss.jsx does
+      try {
+        const message = `Find learning resources for the skill: "${skillName}". Please provide one online resource and one YouTube video with titles and URLs.`;
+        
+        const fallbackResponse = await fetch(`${API_BASE_URL}/generate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ input_message: message })
+        });
+
+        if (!fallbackResponse.ok) {
+          throw new Error(`HTTP ${fallbackResponse.status}: ${fallbackResponse.statusText}`);
+        }
+
+        const fallbackData = await fallbackResponse.json();
+        const fallbackResponse_text = fallbackData.value || fallbackData.response || fallbackData.output || 'Resource service unavailable';
+        
+        const resources = parseResourcesFromResponse(fallbackResponse_text);
+        setSkillResources(prev => ({
+          ...prev,
+          [skillId]: resources
+        }));
+
+      } catch (fallbackError) {
+        setResourceErrors(prev => ({
+          ...prev,
+          [skillId]: `Failed to fetch resources: ${error.message}`
+        }));
+      }
+    } finally {
+      setLoadingResources(prev => ({ ...prev, [skillId]: false }));
+    }
+  };
+
+  // Fallback resources for common skills
+  const getFallbackResources = (skillName) => {
+    const fallbacks = {
+      'javascript': {
+        resource: { title: "JavaScript Guide - MDN", url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide", type: "guide" },
+        video: { title: "JavaScript Tutorial for Beginners", url: "https://youtube.com/watch?v=W6NZfCO5SIk", channel: "Programming with Mosh" }
+      },
+      'html': {
+        resource: { title: "HTML Tutorial - W3Schools", url: "https://www.w3schools.com/html/", type: "course" },
+        video: { title: "HTML Full Course - Build a Website Tutorial", url: "https://youtube.com/watch?v=pQN-pnXPaVg", channel: "freeCodeCamp.org" }
+      },
+      'css': {
+        resource: { title: "CSS Tutorial - W3Schools", url: "https://www.w3schools.com/css/", type: "course" },
+        video: { title: "CSS Tutorial - Zero to Hero", url: "https://youtube.com/watch?v=1Rs2ND1ryYc", channel: "freeCodeCamp.org" }
+      },
+      'react': {
+        resource: { title: "React Documentation", url: "https://react.dev/learn", type: "guide" },
+        video: { title: "React Course - Beginner's Tutorial for React JavaScript Library", url: "https://youtube.com/watch?v=bMknfKXIFA8", channel: "freeCodeCamp.org" }
+      }
+    };
+
+    const skillKey = skillName.toLowerCase().replace(/[^a-z]/g, '');
+    for (const [key, resources] of Object.entries(fallbacks)) {
+      if (skillKey.includes(key)) {
+        return resources;
+      }
+    }
+    return null;
+  };
+
+  // Function to validate YouTube URLs (basic check)
+  const isValidYouTubeUrl = (url) => {
+    if (!url) return false;
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    return youtubeRegex.test(url);
+  };
+
+  // Function to validate general URLs
+  const isValidUrl = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Function to parse AI response and extract resource information
+  const parseResourcesFromResponse = (aiResponse) => {
+    try {
+      // Try to extract JSON from the response
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return parsed;
+      }
+
+      // Fallback: Parse manually if JSON parsing fails
+      const resourceMatch = aiResponse.match(/(?:resource|course|article|guide).*?title[:\s]*["']([^"']+)["'].*?url[:\s]*["']([^"']+)["']/is);
+      const videoMatch = aiResponse.match(/(?:video|youtube).*?title[:\s]*["']([^"']+)["'].*?url[:\s]*["']([^"']+)["']/is);
+
+      return {
+        resource: resourceMatch && isValidUrl(resourceMatch[2]) ? {
+          title: resourceMatch[1],
+          url: resourceMatch[2],
+          type: "resource"
+        } : null,
+        video: videoMatch && isValidYouTubeUrl(videoMatch[2]) ? {
+          title: videoMatch[1],
+          url: videoMatch[2],
+          channel: "Unknown Channel"
+        } : null
+      };
+    } catch (error) {
+      console.error('Error parsing AI response:', error);
+      return { resource: null, video: null };
+    }
+  };
+
   const toggleSkillCompletion = (skillId) => {
     setCompletedSkills((prev) => {
       const copy = new Set(prev);
@@ -114,6 +327,16 @@ export default function Skills() {
           selectedPath
         )}&role=${encodeURIComponent(selectedRole)}&skill=${encodeURIComponent(skillId)}`
     );
+  };
+
+  const handleFetchResources = (skillId, skillName) => {
+    if (!skillResources[skillId] && !loadingResources[skillId]) {
+      fetchResourcesForSkill(skillId, skillName);
+    }
+  };
+
+  const openExternalLink = (url) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const completionPercentage =
@@ -154,9 +377,8 @@ export default function Skills() {
             </span>
           </h1>
           <p className="text-lg text-zinc-300 max-w-3xl mx-auto leading-relaxed mb-8">
-            Master these essential skills to become job-ready. Track your progress and test your knowledge.
+            Master these essential skills to become job-ready. Track your progress and get AI-curated learning resources.
           </p>
-
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-xl border border-green-100 p-8 mb-12">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-white">Learning Progress</h3>
@@ -188,6 +410,10 @@ export default function Skills() {
           <div className="space-y-6 mb-12">
             {skills.map((skill) => {
               const isCompleted = completedSkills.has(skill.id);
+              const resources = skillResources[skill.id];
+              const isLoadingResources = loadingResources[skill.id];
+              const resourceError = resourceErrors[skill.id];
+
               return (
                 <div
                   key={skill.id}
@@ -245,28 +471,88 @@ export default function Skills() {
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                          <BookOpen className="w-4 h-4" />
-                          Learning Resources
-                        </h4>
-                          {isLoading ? (  <div className="flex justify-center items-center h-40">
-                           <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-orange-600"></div> <p className=" text-2xl px-5"> Fetching from Ai</p>
-                            </div>) : (
-                          <div className="grid md:grid-cols-2 gap-3">
-                            {skill.resources.map((resource, resourceIndex) => (
-                              <a
-                                key={resourceIndex}
-                                href={resource.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-orange-100 transition-colors group"
-                              >
-                                <ExternalLink className="w-4 h-4 text-orange-500 group-hover:text-orange-700" />
-                                <span className="text-sm font-medium text-orange-500">{resource.name}</span>
-                              </a>
-                            ))}
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <BookOpen className="w-4 h-4" />
+                            🤖 AI-Curated Learning Resources
+                          </h4>
+                          {!resources && !isLoadingResources && !resourceError && (
+                            <button
+                              onClick={() => handleFetchResources(skill.id, skill.name)}
+                              className="text-xs bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600 transition-colors"
+                            >
+                              Get Resources
+                            </button>
+                          )}
+                        </div>
+
+                        {isLoadingResources ? (
+                          <div className="flex justify-center items-center h-20 bg-white rounded-xl">
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="w-5 h-5 animate-spin text-orange-600" />
+                              <p className="text-gray-600">Fetching personalized resources from AI...</p>
+                            </div>
                           </div>
-                          )} 
+                        ) : resourceError ? (
+                          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                            <div className="flex items-center gap-2 text-sm text-red-600 mb-2">
+                              <AlertCircle className="w-4 h-4" />
+                              {resourceError}
+                            </div>
+                            <button
+                              onClick={() => fetchResourcesForSkill(skill.id, skill.name)}
+                              className="text-xs text-blue-600 hover:text-blue-800"
+                            >
+                              Try again
+                            </button>
+                          </div>
+                        ) : resources ? (
+                          <div className="space-y-3">
+                            {/* Online Resource */}
+                            {resources.resource && (
+                              <div 
+                                className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors group cursor-pointer"
+                                onClick={() => openExternalLink(resources.resource.url)}
+                              >
+                                <BookOpen className="w-4 h-4 text-blue-500" />
+                                <div className="flex-1">
+                                  <span className="text-sm font-medium text-blue-700 block">
+                                    {resources.resource.title}
+                                  </span>
+                                  <span className="text-xs text-blue-500">
+                                    {resources.resource.type?.toUpperCase() || 'RESOURCE'}
+                                  </span>
+                                </div>
+                                <ExternalLink className="w-4 h-4 text-blue-500 group-hover:text-blue-700" />
+                              </div>
+                            )}
+
+                            {/* YouTube Video */}
+                            {resources.video && (
+                              <div 
+                                className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors group cursor-pointer"
+                                onClick={() => openExternalLink(resources.video.url)}
+                              >
+                                <Video className="w-4 h-4 text-red-500" />
+                                <div className="flex-1">
+                                  <span className="text-sm font-medium text-red-700 block">
+                                    {resources.video.title}
+                                  </span>
+                                  <span className="text-xs text-red-500">
+                                    YOUTUBE VIDEO {resources.video.channel && `• ${resources.video.channel}`}
+                                  </span>
+                                </div>
+                                <ExternalLink className="w-4 h-4 text-red-500 group-hover:text-red-700" />
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                            <p className="text-sm text-gray-500 text-center">
+                              Click "Get Resources" to fetch AI-curated learning materials for this skill
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -312,7 +598,6 @@ export default function Skills() {
     </div>
   );
 }
-
 
 const SkillTracker = ({ skills, completedSkills }) => {
   const [showCongrats, setShowCongrats] = useState(false);
