@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+Simple CORS proxy server to test PathwiseAgent
 Simple CORS proxy server to test your pathwise
 Run this on port 3001 to proxy requests to your agent on port 8000
 """

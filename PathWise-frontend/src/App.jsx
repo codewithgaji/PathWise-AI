@@ -4,7 +4,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import LandingPage from './pages/LandingPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import AuthPages from './components/auth/AuthPages';
+import RegisterPage from './components/auth/RegisterPage';
+import LoginPage from './components/auth/LoginPage';
+import EmailVerifyPage from './components/auth/EmailVerifyPage';
 
 import CareerPathPage from './components/CareerPath';
 import { Courselection } from './components/Courselection';
@@ -59,7 +61,9 @@ const AnimatedRoutes = () => {
         </Route>
 
         {/* ✅ Route WITHOUT Navbar + Footer */}
-        <Route path="/auth" element={<AnimatedPageWrapper><AuthPages /></AnimatedPageWrapper>} />
+        <Route path="/register" element={<AnimatedPageWrapper><RegisterPage /></AnimatedPageWrapper>} />
+        <Route path="/login" element={<AnimatedPageWrapper><LoginPage /></AnimatedPageWrapper>} />
+        <Route path="/verify" element={<AnimatedPageWrapper><EmailVerifyPage /></AnimatedPageWrapper>} />
 
         {/* ✅ Other routes also WITHOUT Navbar + Footer */}
         <Route path="/course-selection" element={<AnimatedPageWrapper><Courselection /></AnimatedPageWrapper>} />
