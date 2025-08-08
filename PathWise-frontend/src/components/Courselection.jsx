@@ -211,12 +211,11 @@ export const Courselection = () => {
           <h4 className="text-center text-green-400 text-2xl font-semibold mb-12">Popular Courses</h4>
           <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { name: "Chemistry", icon: "⚗️" },
-              { name: "Physics", icon: "🔬" },
-              { name: "Electrical Engineering", icon: "⚡" },
-              { name: "Cybersecurity", icon: "🛡️" },
-              { name: "Software Engineering", icon: "💻" },
-              { name: "Data Analysis", icon: "📊" }
+              { name: "Computer Science", icon: "💻" },
+              { name: "Law", icon: "⚖️" },
+              { name: "Economics", icon: "📈" },
+              { name: "Business Administration", icon: "💼" },
+              { name: "Medicine", icon: "🩺" }
             ].map((course, index) => (
               <button
                 key={index}
