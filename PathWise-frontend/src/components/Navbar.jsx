@@ -64,7 +64,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center relative z-10">
-          <a href="/auth" className="px-8 py-2 bg-green-500 text-white rounded-lg hover:bg-green-400 transition-all duration-200 font-medium">
+          <a href="/register" className="px-8 py-2 bg-green-500 text-white rounded-lg hover:bg-green-400 transition-all duration-200 font-medium">
             Launch
           </a>
         </div>

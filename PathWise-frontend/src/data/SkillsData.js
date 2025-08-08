@@ -37,8 +37,21 @@ import {
 const skillsData = {
   //  computer science
   "frontend-developer": {
-    roleName: "Frontend Engineer",
+    roleName: "Frontend Developer",
     skills: [
+      {
+        id: "htmlNcss",
+        name: "HTML & CSS",
+        icon: BookOpen,
+        description: "Structure and style accessible, responsive interfaces using HTML5 and modern CSS (Flexbox/Grid).",
+        difficulty: "Beginner",
+        timeEstimate: "2-3 weeks",
+        completed: false,
+        resources: [
+          { name: "CSS Tricks", url: "https://css-tricks.com" },
+          { name: "MDN HTML & CSS", url: "https://developer.mozilla.org/en-US/docs/Web" }
+        ]
+      },
       {
         id: "javascript",
         name: "JavaScript Fundamentals",
@@ -64,19 +77,6 @@ const skillsData = {
         resources: [
           { name: "React Official Docs", url: "https://react.dev" },
           { name: "React Tutorial", url: "https://react.dev/tutorial" }
-        ]
-      },
-      {
-        id: "html-css",
-        name: "HTML & CSS",
-        icon: BookOpen,
-        description: "Structure and style accessible, responsive interfaces using HTML5 and modern CSS (Flexbox/Grid).",
-        difficulty: "Beginner",
-        timeEstimate: "2-3 weeks",
-        completed: false,
-        resources: [
-          { name: "CSS Tricks", url: "https://css-tricks.com" },
-          { name: "MDN HTML & CSS", url: "https://developer.mozilla.org/en-US/docs/Web" }
         ]
       },
       {
