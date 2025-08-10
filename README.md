@@ -1,3 +1,6 @@
+![Pathwise](Pathwise.png)
+
+
 # PathWise-AI
 
 PathWise-AI is an interactive career guidance platform designed to help Nigerian graduates and job seekers explore career paths, build relevant skills, and complete hands-on projects. The platform provides curated learning roadmaps, assessments, and project workspaces for various tech and professional roles.
