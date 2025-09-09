@@ -45,7 +45,7 @@ def proxy(path):
             headers=dict(resp.headers)
         )
         
-        # Add CORS headers
+        # Add CORS headers now
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
         
