@@ -69,6 +69,14 @@ PathWise-frontend/
    yarn dev
    ```
 
+4. Open another Terminal to run the mongoDB server
+
+   ### CD to "Pathwise-backend" - ensure the DB is installed and connected to the environment variables
+   ```sh
+   npm install
+   npm start
+   ```
+
 4. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Build for Production
