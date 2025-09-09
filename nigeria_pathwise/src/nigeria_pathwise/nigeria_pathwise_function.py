@@ -60,7 +60,7 @@ app.add_middleware(
 
 logger = logging.getLogger(__name__)
 
-# Load and process the career guide data
+# Load and process the career guide data immediately
 def load_career_data():
     """Load the Nigeria career guide CSV data"""
     try:
