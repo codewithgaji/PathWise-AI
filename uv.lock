@@ -7,7 +7,6 @@ resolution-markers = [
     "python_full_version >= '3.12' and python_full_version < '3.12.4'",
     "python_full_version < '3.12'",
 ]
-
 [[package]]
 name = "aioboto3"
 version = "15.0.0"
