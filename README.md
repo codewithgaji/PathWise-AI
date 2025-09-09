@@ -98,5 +98,4 @@ yarn lint
 [MIT](LICENSE)
 
 ---
-
 *Made for Nigerian graduates and job hunters by students
