@@ -39,166 +39,303 @@ PathWise-frontend/
 - **data/**: Static data for skills, roles, and projects (e.g., [`SkillsData.js`](src/data/SkillsData.js), [`roleProjectSets.js`](src/data/roleProjectSets.js))
 - **pages/**: Top-level route components (e.g., `About.jsx`)
 - **assets/**: Images and static assets
+# 🚀 PathWise AI Complete Project Setup Guide
 
-## Installation & Setup
+This guide walks you through setting up the PathWise AI project inside **WSL Ubuntu** from scratch. Follow the steps carefully, and by the end, you'll have both the frontend and backend running with MongoDB connected.
 
-### Prerequisites
+---
 
-- [Node.js](https://nodejs.org/) (v16+ recommended)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
-- Python 3.8+
+## 1️⃣ Install WSL and Ubuntu
 
-### Frontend Setup
+Run this command from **PowerShell** (as Administrator) on Windows to install WSL with Ubuntu:
 
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/yourusername/pathwise-ai.git
-   cd PathWise-frontend
-   ```
-
-2. Install dependencies:
-   ```sh
-   npm install
-   # or
-   yarn install
-   ```
-
-3. Start the development server:
-   ```sh
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-### Backend Setup
-
-4. Open another Terminal to run the MongoDB server:
-
-   **CD to "Pathwise-backend"** - ensure the DB is installed and connected to the environment variables
-   ```sh
-   npm install
-   npm start
-   ```
-
-### AI Agent Setup
-
-5. **Create Python Environment - New Terminal:**
-   ```sh
-   # Create Python environment
-   uv venv --seed .venv
-
-   # Activate the Python environment
-   source .venv/bin/activate
-   ```
-
-6. **Install AI Dependencies:**
-   ```sh
-   # Install AIQ toolkit (just 30MB)
-   uv add aiqtoolkit
-   uv add fastapi uvicorn
-
-   # Install the agent
-   uv pip install -e .
-   uv pip install -e nigeria_pathwise
-   ```
-
-7. **Configure AI Agent:**
-   ```sh
-   # Delete existing agent to remove system symlink
-   nat workflow delete nigeria_pathwise
-
-   # Create the agent
-   nat workflow create nigeria_pathwise
-   ```
-
-8. **Update Agent Files:**
-
-   Replace the following files in your directory with the latest versions:
-
-   - **Function File:** Replace `nigeria_pathwise/src/nigeria_pathwise/nigeria_pathwise_function.py` with:
-     https://github.com/codewithgaji/PathWise-AI/blob/master/nigeria_pathwise/src/nigeria_pathwise/nigeria_pathwise_function.py
-
-   - **Config File:** Replace `nigeria_pathwise/src/nigeria_pathwise/configs/config.yml` with:
-     https://github.com/codewithgaji/PathWise-AI/blob/master/nigeria_pathwise/src/nigeria_pathwise/configs/config.yml
-
-9. **Run the AI Agent:**
-   ```sh
-   # Start the AI agent server
-   nat serve --config_file nigeria_pathwise/configs/config.yml
-   ```
-
-10. **Install flask:**
-    ```sh
-    # In a new terminal, activate env(source .venv/bin/activate)  install flask:
-    pip install flask
-    pip install flask_cors
-    ```
-
-11. **Open your project side bar, right inside 'nigeria_pathwise' create a new folder called 'data'**
-    ```sh
-    create a new file called 'nigeria_career_guide.csv'
-    copy the data from 'nigeria_career_guide.csv' in data here in the repo to the       new file you created.
-    The AI should work very well like this.
-
-### Access the Application
-
-- **Frontend:** Open [http://localhost:5173](http://localhost:5173) in your browser
-- **Backend:** MongoDB server running on configured port
-- **AI Agent:** Running with FastAPI and accessible through the frontend
-
-## Development
-
-### Build for Production
-
-```sh
-npm run build
-# or
-yarn build
+```bash
+wsl --install
 ```
 
-### Linting
+After installation, **restart your PC** and open Ubuntu (WSL) from your terminal dropdown.
 
-```sh
-npm run lint
-# or
-yarn lint
+---
+
+## 2️⃣ Update Ubuntu Packages
+
+Inside Ubuntu, update and upgrade your system:
+
+```bash
+sudo apt update && sudo apt upgrade -y
 ```
 
-## Customization
+**Note:** You will be prompted to enter your **system password** (the password you use to log into your Windows laptop). Type it carefully as characters won't be displayed on screen.
 
-- To add or edit skills, modify [`SkillsData.js`](src/data/SkillsData.js).
-- To update project sets for each role, edit [`roleProjectSets.js`](src/data/roleProjectSets.js).
-- UI components can be found in [`components/`](src/components/).
-- AI agent configuration can be modified in the `config.yml` file.
+---
 
-## Troubleshooting
+## 3️⃣ Install Python 3
 
-### Common Issues
+Ubuntu usually comes with Python 3 preinstalled. Confirm the installation:
 
-**MongoDB Connection Issues:**
-```sh
-# Check if MongoDB is running
-sudo systemctl status mongod  # Linux
-brew services list | grep mongodb  # macOS
-
-# Restart MongoDB if needed
-sudo systemctl restart mongod  # Linux
-brew services restart mongodb-community  # macOS
+```bash
+python3 --version
 ```
 
-**User Registration Issues:**
-- Verify backend server is running on correct port
-- Check MongoDB connection in backend logs
-- Ensure CORS is properly configured for frontend-backend communication
-- Verify environment variables are loaded correctly
+If not installed or you need additional Python tools:
 
-**General Troubleshooting:**
-- Ensure Python environment is activated before running AI agent commands
-- Check that all ports are available (5173 for frontend, 5000 for backend, AI agent port)
-- Verify MongoDB connection and environment variables are properly configured
-- Make sure to update the agent files from the GitHub repository for latest functionality
-- Check browser console and backend logs for specific error messages
+```bash
+sudo apt install -y python3 python3-venv python3-pip
+```
+
+**Note:** You may need to enter your system password again.
+
+---
+
+## 4️⃣ Create and Activate Python Virtual Environment
+
+Navigate to your project directory and create a virtual environment:
+
+```bash
+python3 -m venv .venv
+```
+
+Activate the virtual environment:
+
+```bash
+source .venv/bin/activate
+```
+
+**Important:** Once activated, you should see `(.venv)` at the beginning of your terminal prompt, indicating the virtual environment is active.
+
+---
+
+## 5️⃣ Install curl
+
+Install curl, which we'll need for downloading Node.js:
+
+```bash
+sudo apt install -y curl
+```
+
+---
+
+## 6️⃣ Remove Outdated Node.js and npm
+
+The default Ubuntu repositories often have outdated Node.js and npm. Remove them first:
+
+```bash
+sudo apt remove -y nodejs npm
+```
+
+Clean up any leftover dependencies:
+
+```bash
+sudo apt autoremove -y
+```
+
+**Why we do this:** The existing Node.js and npm versions in Ubuntu's default repos are typically outdated. We need the latest stable versions for modern development.
+
+---
+
+## 7️⃣ Install Latest Node.js (LTS)
+
+Add the official NodeSource repository for the latest Node.js 20.x LTS:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+```
+
+Install Node.js:
+
+```bash
+sudo apt install -y nodejs
+```
+
+**Note:** You may be prompted for your system password again.
+
+Verify the installation:
+
+```bash
+node -v
+npm -v
+```
+
+Both commands should return version numbers (Node.js 20.x and npm 10.x or higher).
+
+---
+
+## 8️⃣ Install uv Inside Virtual Environment
+
+**Important:** Make sure your virtual environment is activated (you should see `(.venv)` in your prompt).
+
+Install uv using pip:
+
+```bash
+pip install uv
+```
+
+**Why inside virtual environment:** Ubuntu manages system packages strictly, so we install uv inside the virtual environment to avoid conflicts.
+
+---
+
+## 9️⃣ Setup Frontend
+
+Navigate to the frontend folder and install dependencies:
+
+```bash
+cd Pathwise-frontend
+npm install
+```
+
+Start the frontend development server:
+
+```bash
+npm run dev
+```
+
+If successful, your frontend will start running (usually on `http://localhost:3000` or similar).
+
+---
+
+## 🔟 Setup Backend
+
+**Open a new terminal** in Ubuntu (WSL) while keeping the frontend running.
+
+Navigate to your project root and activate the Python environment:
+
+```bash
+cd PathWise-AI
+source .venv/bin/activate
+```
+
+Move into the backend folder:
+
+```bash
+cd Pathwise-backend
+```
+
+**Note:** Before running the backend, we need to install and configure MongoDB.
+
+---
+
+## 1️⃣1️⃣ Install MongoDB
+
+MongoDB doesn't yet provide repositories for Ubuntu "Noble" (24.04). We'll use the Jammy (22.04) repository which is fully compatible.
+
+### Add MongoDB GPG Key
+
+```bash
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /usr/share/keyrings/mongodb-server-7.0.gpg > /dev/null
+```
+
+### Add MongoDB Repository
+
+```bash
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+```
+
+### Update Package Lists
+
+```bash
+sudo apt update
+```
+
+### Install MongoDB
+
+```bash
+sudo apt install -y mongodb-org
+```
+
+---
+
+## 1️⃣2️⃣ Start and Enable MongoDB
+
+Start MongoDB immediately:
+
+```bash
+sudo systemctl start mongod
+```
+
+Enable MongoDB to auto-start on system boot:
+
+```bash
+sudo systemctl enable mongod
+```
+
+Check MongoDB status:
+
+```bash
+sudo systemctl status mongod
+```
+
+**Expected output:** You should see `Active: active (running)` in green text.
+
+---
+
+## 1️⃣3️⃣ Verify MongoDB Connection
+
+Test the MongoDB connection:
+
+```bash
+mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
+```
+
+If MongoDB is working correctly, you should see `"ok" : 1` in the output 🎉.
+
+---
+
+## 1️⃣4️⃣ Run Backend
+
+Now install backend dependencies and start the server:
+
+```bash
+npm install
+npm start
+```
+
+If MongoDB is running properly, the backend should connect successfully and display connection confirmation messages.
+
+---
+
+## ✅ Final Verification
+
+You should now have:
+
+1. **Frontend running** (usually `http://localhost:3000`)
+2. **Backend running** (usually `http://localhost:8000` or `http://localhost:5000`)
+3. **MongoDB active** and connected
+
+---
+
+## 🔧 Important Notes
+
+- **Virtual Environment:** Always activate your virtual environment (`source .venv/bin/activate`) before running backend commands or installing Python packages.
+
+- **MongoDB:** MongoDB is installed system-wide in Ubuntu, not inside your Python virtual environment.
+
+- **Auto-start:** With `systemctl enable`, MongoDB will automatically start every time WSL boots up.
+
+- **Password Prompts:** Throughout this process, you'll be asked to enter your system password multiple times. This is the same password you use to log into your Windows laptop.
+
+- **Terminal Management:** Keep your frontend and backend running in separate terminal windows for easier development.
+
+---
+
+## 🚨 Troubleshooting
+
+**If Node.js installation fails:**
+- Make sure you're connected to the internet
+- Try running `sudo apt update` again before the curl command
+
+**If MongoDB won't start:**
+- Check if it's already running: `sudo systemctl status mongod`
+- Try restarting: `sudo systemctl restart mongod`
+
+**If you get permission errors:**
+- Make sure you're using `sudo` where indicated
+- Verify you're entering the correct system password
+
+**If virtual environment doesn't activate:**
+- Make sure you're in the correct directory
+- Try recreating it: `rm -rf .venv && python3 -m venv .venv`
+
+Your PathWise AI development environment is now ready! 🚀
 
 ## License
 
