@@ -130,7 +130,9 @@ PathWise-frontend/
 
 10. **Start CORS Proxy:**
     ```sh
-    # In a new terminal, run the CORS proxy
+    # In a new terminal, run the CORS proxy one after the other
+    pip install flask
+    pip install flask_cors
     python cors_proxy.py
     ```
 
