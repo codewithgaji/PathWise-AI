@@ -128,13 +128,17 @@ PathWise-frontend/
    nat serve --config_file nigeria_pathwise/configs/config.yml
    ```
 
-10. **Start CORS Proxy:**
+10. **Install flask:**
     ```sh
-    # In a new terminal, run the CORS proxy one after the other
+    # In a new terminal, activate env(source .venv/bin/activate)  install flask:
     pip install flask
     pip install flask_cors
-    python cors_proxy.py
     ```
+
+11. **Open your project side bar, right inside 'nigeria_pathwise' create a new folder called 'data'**
+    ```sh
+    create a new file called 'nigeria_career_guide.csv'
+    copy the data from 'nigeria_career_guide.csv' in data here in the repo to the       new file you created.
 
 ### Access the Application
 
