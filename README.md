@@ -139,6 +139,7 @@ PathWise-frontend/
     ```sh
     create a new file called 'nigeria_career_guide.csv'
     copy the data from 'nigeria_career_guide.csv' in data here in the repo to the       new file you created.
+    The AI should work very well like this.
 
 ### Access the Application
 
