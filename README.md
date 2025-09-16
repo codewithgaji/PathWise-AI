@@ -106,10 +106,10 @@ PathWise-frontend/
 7. **Configure AI Agent:**
    ```sh
    # Delete existing agent to remove system symlink
-   aiq workflow delete nigeria_pathwise
+   nat workflow delete nigeria_pathwise
 
    # Create the agent
-   aiq workflow create nigeria_pathwise
+   nat workflow create nigeria_pathwise
    ```
 
 8. **Update Agent Files:**
