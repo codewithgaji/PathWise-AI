@@ -310,6 +310,15 @@ source .venv/bin/activate
 pip install flask flask_cors
 ```
 
+
+## 1️⃣5️⃣ After that run:
+```sh
+python cors_proxy.py
+```
+
+Then this server should activate as well, and you are good to go 🎉🎉🎉🎊
+
+
 ## ✅ Final Verification
 
 You should now have:
