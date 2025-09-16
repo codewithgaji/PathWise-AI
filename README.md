@@ -283,14 +283,6 @@ nat workflow create nigeria_pathwise
 
 Update Agent Files by replacing the following files with the latest versions from the repository:
 
-Replace:
-- `nigeria_pathwise/src/nigeria_pathwise/nigeria_pathwise_function.py`
-
-with:
-
-- `vector.py` in the repo.
-
-
 
 Run the AI Agent:
 
