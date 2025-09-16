@@ -125,7 +125,7 @@ PathWise-frontend/
 9. **Run the AI Agent:**
    ```sh
    # Start the AI agent server
-   aiq serve --config_file nigeria_pathwise/configs/config.yml
+   nat serve --config_file nigeria_pathwise/configs/config.yml
    ```
 
 10. **Start CORS Proxy:**
