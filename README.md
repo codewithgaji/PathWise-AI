@@ -194,6 +194,8 @@ sudo systemctl status mongod
 
 **Expected output:** You should see `Active: active (running)` in green text.
 
+#### You should use **Ctrl + C** to stop server loading then continue
+
 ### Verify MongoDB Connection
 
 Test the MongoDB connection:
