@@ -60,7 +60,7 @@ app.add_middleware(
 
 logger = logging.getLogger(__name__)
 
-# Load and process the career guide data immediately
+# Load and process the career guide data
 def load_career_data():
     """Load the Nigeria career guide CSV data"""
     try:
@@ -552,6 +552,7 @@ When users ask for resources, you should:
 Remember: Your goal is to empower users to make informed career decisions and achieve their professional aspirations through structured guidance and continuous support.
 """
 
+# ...existing code...
 @register_function(config_type=NigeriaPathwiseFunctionConfig)
 async def nigeria_pathwise_function(
     config: NigeriaPathwiseFunctionConfig, builder: Builder
@@ -561,11 +562,11 @@ async def nigeria_pathwise_function(
     """
     
     # Initialize components
-    llm_ref = LLMRef(name=config.llm_name)
-    llm = await builder.get_llm(llm_ref)
+    llm_ref = LLMRef(config.llm_name)
+    llm = await builder.get_llm(llm_ref, LLMFrameworkEnum.LANGCHAIN)
     
-    embedder_ref = EmbedderRef(name=config.embedder_name)
-    embedder = await builder.get_embedder(embedder_ref)
+    embedder_ref = EmbedderRef(config.embedder_name)
+    embedder = await builder.get_embedder(embedder_ref, LLMFrameworkEnum.LANGCHAIN)
     
     # Document processing and retrieval setup
     vector_store = None
@@ -607,7 +608,7 @@ async def nigeria_pathwise_function(
     additional_tools = []
     for tool_name in config.tool_names:
         try:
-            tool_ref = FunctionRef(name=tool_name)
+            tool_ref = FunctionRef(tool_name)
             tool = await builder.get_function_as_tool(tool_ref)
             additional_tools.append(tool)
         except Exception as e:
