@@ -288,13 +288,26 @@ Update Agent Files by replacing the following files with the latest versions fro
 Create:
 ```sh
 'config.yml' file in 'nigeria_pathwise/configs/' in your cloned repo
-# Then copy the file content of the github repo of nigeria_pathwise/configs/config.yml into your own file as well.
+# You might run into a 'file restriction error' in this case.
+instead, open 'src' that exists in the nigeria_pathwise folder.
+
+# open the nigeria_pathwise folder inside that as well, you should see the 'configs/config.yml that exists there.
+
+click the 'config.yml' press Ctrl + x to cut/move the file and then
+
+go to nigeria_pathwise root folder where we have our configs folder
+
+with no content and then press Ctrl + V to paste it IN the 'configs' folder or right click your mouse and choose paste.
+
+# Then copy the file content of the github repo:
+
+of nigeria_pathwise/configs/config.yml into your own file as well.
 ```
 
 Also replace:
 ```sh
-nigeria_pathwise/nigeria_pathwise_function.py with:
-vector.py in the repository
+nigeria_pathwise/nigeria_pathwise_function.py content with:
+vector.py content in the repository
 ```
 
 Create 'data' folder in 'nigeria_pathwise' root folder:
