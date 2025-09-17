@@ -285,10 +285,10 @@ nat workflow create nigeria_pathwise
 
 Update Agent Files by replacing the following files with the latest versions from the repository:
 
-Replace:
+Create:
 ```sh
-nigeria_pathwise/configs/config.yml file with:
-the repository nigeria_pathwise/configs/config.yml file
+'config.yml' file in 'nigeria_pathwise/configs/' in your cloned repo
+# Then copy the file content of the github repo of nigeria_pathwise/configs/config.yml into your own file as well.
 ```
 
 Also replace:
