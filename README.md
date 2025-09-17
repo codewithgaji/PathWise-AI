@@ -297,6 +297,16 @@ nigeria_pathwise/nigeria_pathwise_function.py with:
 vector.py in the repository
 ```
 
+Create 'data' folder in 'nigeria_pathwise' root folder:
+
+```bash
+# In the 'data' folder create:
+nigeria_career_guide.csv file
+
+# Then copy the content of 'nigeria_career_guide.csv' that is in the repo
+To the 'nigeria_career_guide.csv' file that you created.
+```
+
 
 Run the AI Agent:
 
