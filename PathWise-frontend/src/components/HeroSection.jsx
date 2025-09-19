@@ -1,98 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const HeroSection = () => {
+export default function HeroSection() {
+  const [studentsCount, setStudentsCount] = useState(0);
+  const [careerPathsCount, setCareerPathsCount] = useState(0);
+  const [successRateCount, setSuccessRateCount] = useState(0);
+
+  useEffect(() => {
+    const animateCounters = () => {
+      const duration = 4000;// 4seconds
+      const steps = 60; // 60 steps for smooth animation
+      const stepDuration = duration / steps;
+
+      let currentStep = 0;
+
+      const interval = setInterval(() => {
+        currentStep++;
+        const progress = currentStep / steps;
+
+        setStudentsCount(Math.floor(10000 * progress));
+        setCareerPathsCount(Math.floor(500 * progress));
+        setSuccessRateCount(Math.floor(95 * progress));
+
+        if (currentStep >= steps) {
+          clearInterval(interval);
+          // Set final values to ensure exact numbers
+          setStudentsCount(10000);
+          setCareerPathsCount(500);
+          setSuccessRateCount(95);
+        }
+      }, stepDuration);
+
+      return () => clearInterval(interval);
+    };
+
+    const cleanup = animateCounters();
+    return cleanup;
+  }, []);
+
   return (
-    <div className="bg-[#101727] flex flex-col items-center justify-center text-center w-full px-6 pb-10 relative overflow-hidden">
-      {/* Multiple green elliptical blur effects */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '20%',
-          left: '15%',
-          width: '400px',
-          height: '200px',
-          background: '#01742B',
-          borderRadius: '50%',
-          filter: 'blur(80px)',
-          opacity: 0.25,
-          zIndex: 1
-        }}
-      />
-      
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '60%',
-          right: '20%',
-          width: '350px',
-          height: '175px',
-          background: '#01742B',
-          borderRadius: '50%',
-          filter: 'blur(70px)',
-          opacity: 0.2,
-          zIndex: 1
-        }}
-      />
+    <section className="min-h-screen flex flex-col justify-center items-center px-6" style={{ background: 'linear-gradient(135deg, #1a4a3a 0%, #2d5a4a 20%, #101727 50%, #0f2419 80%, #101727 100%)' }}>
+      <div className="max-w-5xl mx-auto text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center space-x-2 bg-gray-800 bg-opacity-50 px-6 py-3 rounded-full mb-12 border border-gray-700 mt-7">
+          <span className="text-2xl">🚀</span>
+          <span className="text-green-400 font-medium">Your personalized career journey starts here</span>
+        </div>
+        
+        {/* Main Heading */}
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          Your Career Roadmap,
+          <br />
+          <span className="text-green-500">Personalized & Guided</span>
+        </h1>
 
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: '10%',
-          left: '30%',
-          width: '300px',
-          height: '150px',
-          background: '#01742B',
-          borderRadius: '50%',
-          filter: 'blur(60px)',
-          opacity: 0.15,
-          zIndex: 1
-        }}
-      />
-      
-      <h1 className="text-5xl font-bold text-white mb-5 max-w-4xl leading-tight mt-10 relative z-10">
-        Find Your Career Path<br />
-        With Confidence
-      </h1>
+        {/* Subtitle */}
+        <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+          Stop wandering through endless courses. Get a step-by-step roadmap 
+          tailored to your goals, from beginner to industry standard.
+        </p>
 
-      <p className="text-xl text-gray-200 mb-10 max-w-2xl relative z-10">
-        PathWise AI guides you to discover, plan, and succeed in the career you're meant for.
-      </p>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
+          <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors min-w-48">
+            Start Your Journey
+          </button>
+          <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors min-w-48">
+            Watch Demo
+          </button>
+        </div>
 
-      <button
-        className="relative overflow-hidden font-semibold text-white transition-all duration-300 hover:transform hover:-translate-y-0.5 px-8 py-3 border rounded-lg hover:bg-green-700 mb-10 z-10"
-        style={{
-          background: '#0000003D',
-          borderColor: 'linear-gradient(89.97deg, rgba(1, 111, 42, 0.62) 0.03%, rgba(0, 167, 62, 0.62) 71.71%)',
-          backdropFilter: 'blur(10px)',
-          cursor: 'pointer'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.boxShadow = '0 5px 15px rgba(0, 100, 25, 0.4)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.boxShadow = 'none';
-        }}
-      >
-        <a href="/auth"><span className="relative z-10">
-          Get Started
-        </span></a>
-      </button>
-
-      {/* PNG Image */}
-      <div className="w-full overflow-hidden flex justify-center px-4 relative z-10">
-        <img
-          src="/images/journey.png"
-          alt="Journey illustration"
-          className="max-w-full h-auto object-contain"
-          style={{
-            width: '100%',
-            display: 'block',
-            marginBottom: 0
-          }}
-        />
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-10">
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-green-500 mb-2">
+              {studentsCount.toLocaleString()}+
+            </div>
+            <div className="text-gray-400 text-lg">Students Guided</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-green-500 mb-2">
+              {careerPathsCount}+
+            </div>
+            <div className="text-gray-400 text-lg">Career Paths</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-green-500 mb-2">
+              {successRateCount}%
+            </div>
+            <div className="text-gray-400 text-lg">Success Rate</div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default HeroSection;
+}

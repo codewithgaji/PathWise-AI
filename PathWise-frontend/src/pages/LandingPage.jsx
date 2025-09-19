@@ -1,12 +1,16 @@
 import React from 'react';
 import HeroSection from '../components/HeroSection';
-import HowItWorks from '../components/HowItWorks';
+import FeaturesSection from '../components/FeaturesSection';
+import WhoWeHelpSection from '../components/WhoWeHelpSection';
+import TestimonialsSectiom from '../components/TestimonialsSection';
 
 const LandingPage = () => {
   return (
     <>
       <HeroSection />
-      <HowItWorks />
+      <FeaturesSection />
+      <WhoWeHelpSection />
+      <TestimonialsSectiom />
     </>
   );
 };
