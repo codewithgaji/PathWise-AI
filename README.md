@@ -4,399 +4,291 @@
 
 PathWise-AI is an interactive career guidance platform designed to help Nigerian graduates and job seekers explore career paths, build relevant skills, and complete hands-on projects. The platform provides curated learning roadmaps, assessments, and project workspaces for various tech and professional roles.
 
-## Features
+## 🚀 Features
 
-- **Career Roadmaps:** Step-by-step skill trees for roles like Frontend Developer, Backend Developer, Fullstack Developer, Product Designer, and more.
-- **Skill Assessments:** Interactive quizzes to validate your knowledge and earn certificates.
-- **Project Workspaces:** Guided, real-world projects with code editors and progress tracking.
-- **Resource Library:** Curated links to top learning materials for each skill.
-- **AI Agent Integration:** Powered by AIQ toolkit for intelligent career guidance and recommendations.
-- **Responsive UI:** Built with React, Tailwind CSS, and Vite for fast, modern web experience.
+- **Career Roadmaps:** Step-by-step skill trees for roles like Frontend Developer, Backend Developer, Fullstack Developer, Product Designer, and more
+- **Skill Assessments:** Interactive quizzes to validate your knowledge and earn certificates
+- **Project Workspaces:** Guided, real-world projects with code editors and progress tracking
+- **Resource Library:** Curated links to top learning materials for each skill
+- **AI Agent Integration:** Powered by AIQ toolkit for intelligent career guidance and recommendations
+- **Responsive UI:** Built with React, Tailwind CSS, and Vite for fast, modern web experience
 
-## Folder Structure
+## 📁 Project Structure
 
 ```
-PathWise-frontend/
-├── public/
-│   ├── images/
-│   └── ...icons and manifest
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── data/
-│   ├── pages/
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── ...
-├── index.html
-├── package.json
-├── tailwind.config.js
-├── vite.config.js
-└── ...
+PathWise-AI/
+├── Pathwise-frontend/
+│   ├── public/
+│   │   ├── images/
+│   │   └── ...icons and manifest
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── data/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── ...
+│   ├── index.html
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── Pathwise-backend/
+├── nigeria_pathwise/
+├── cors_proxy.py
+└── README.md
 ```
 
-- **components/**: React UI components (e.g., `Projects.jsx`, `Skills.jsx`, `Result.jsx`)
-- **data/**: Static data for skills, roles, and projects (e.g., `SkillsData.js`, `roleProjectSets.js`)
-- **pages/**: Top-level route components (e.g., `About.jsx`)
-- **assets/**: Images and static assets
+## 🎯 Prerequisites
 
-## Prerequisites
-
-- Windows 10/11 with WSL2
+- Windows 10/11 with WSL2 support
 - Internet connection for downloading packages
+- Basic familiarity with terminal/command line
 
 ---
 
-# 🚀 Complete Installation & Setup Guide
+# 🛠️ Complete Installation & Setup Guide
 
-This guide walks you through setting up the PathWise AI project inside **WSL Ubuntu** from scratch. Follow the steps carefully, and by the end, you'll have both the frontend and backend running with MongoDB connected.
+This guide walks you through setting up the PathWise AI project inside **WSL Ubuntu** from scratch. Follow the steps carefully to get the complete system running.
 
-## 1️⃣ Install WSL and Ubuntu
+## Step 1: Install WSL and Ubuntu
 
-Run this command from **PowerShell** (as Administrator) on Windows to install WSL with Ubuntu:
+1. Open **PowerShell** as Administrator on Windows
+2. Install WSL with Ubuntu:
+   ```bash
+   wsl --install
+   ```
+3. **Restart your PC** after installation
+4. Open Ubuntu (WSL) from your terminal or Start menu
 
-```bash
-wsl --install
-```
+## Step 2: Update Ubuntu System
 
-After installation, **restart your PC** and open Ubuntu (WSL) from your terminal dropdown.
-
-## 2️⃣ Update Ubuntu Packages
-
-Inside Ubuntu, update and upgrade your system:
+Update and upgrade your Ubuntu system:
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
-**Note:** You will be prompted to enter your **system password** (the password you use to log into your Windows laptop). Type it carefully as characters won't be displayed on screen.
+> **Note:** Enter your Windows system password when prompted. Characters won't be displayed on screen for security.
 
-## 3️⃣ Install Python 3
+## Step 3: Install Essential Tools
 
-Ubuntu usually comes with Python 3 preinstalled. Confirm the installation:
+Install Python 3 and development tools:
 
 ```bash
+# Python 3 (usually pre-installed, but install tools)
+sudo apt install -y python3 python3-venv python3-pip
+
+# Install curl for downloading Node.js
+sudo apt install -y curl
+
+# Verify Python installation
 python3 --version
 ```
 
-If not installed or you need additional Python tools:
-
-```bash
-sudo apt install -y python3 python3-venv python3-pip
-```
-
-## 4️⃣ Clone the Repository
-
-Clone the PathWise AI repository:
+## Step 4: Clone the Repository
 
 ```bash
 git clone https://github.com/codewithgaji/PathWise-AI.git
 cd PathWise-AI
 ```
 
-## 5️⃣ Open a new terminal in Pathwise cloned file. Open it in WSL/Ubuntu terminal, create and Activate Python Virtual Environment
+## Step 5: Set Up Python Virtual Environment
 
-Create a virtual environment:
+Create and activate a Python virtual environment:
 
 ```bash
+# Create virtual environment
 python3 -m venv .venv
-```
 
-Activate the virtual environment:
-
-```bash
+# Activate virtual environment
 source .venv/bin/activate
 ```
 
-**Important:** Once activated, you should see `(.venv)` at the beginning of your terminal prompt.
+> **Important:** You should see `(.venv)` at the beginning of your terminal prompt when activated.
 
-## 6️⃣ Install curl
+## Step 6: Install Node.js (Latest LTS)
 
-Install curl, which we'll need for downloading Node.js:
-
-```bash
-sudo apt install -y curl
-```
-
-## 7️⃣ Remove Outdated Node.js and npm
-
-The default Ubuntu repositories often have outdated Node.js and npm. Remove them first:
+Remove outdated versions and install the latest Node.js:
 
 ```bash
+# Remove outdated Node.js if present
 sudo apt remove -y nodejs npm
 sudo apt autoremove -y
-```
 
-## 8️⃣ Install Latest Node.js (LTS)
-
-Add the official NodeSource repository for Node.js 20.x LTS:
-
-```bash
+# Add NodeSource repository for Node.js 20.x LTS
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-```
 
-Install Node.js:
-
-```bash
+# Install Node.js
 sudo apt install -y nodejs
-```
 
-Verify the installation:
-
-```bash
+# Verify installation
 node -v
 npm -v
 ```
 
-## 9️⃣ Install MongoDB
-
-MongoDB doesn't yet provide repositories for Ubuntu "Noble" (24.04). We'll use the Jammy (22.04) repository which is fully compatible.
-
-### Add MongoDB GPG Key
-```bash
-wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /usr/share/keyrings/mongodb-server-7.0.gpg > /dev/null
-```
+## Step 7: Install and Configure MongoDB
 
 ### Add MongoDB Repository
-```bash
-echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-```
 
-### Update Package Lists
 ```bash
+# Add MongoDB GPG key
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /usr/share/keyrings/mongodb-server-7.0.gpg > /dev/null
+
+# Add MongoDB repository (using Ubuntu 22.04 Jammy for compatibility)
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+# Update package lists
 sudo apt update
 ```
 
-### Install MongoDB
+### Install and Start MongoDB
+
 ```bash
+# Install MongoDB
 sudo apt install -y mongodb-org
-```
 
-## 🔟 Start and Enable MongoDB
-
-Start MongoDB immediately:
-
-```bash
+# Start MongoDB service
 sudo systemctl start mongod
-```
 
-Enable MongoDB to auto-start on system boot:
-
-```bash
+# Enable MongoDB to start automatically on boot
 sudo systemctl enable mongod
-```
 
-Check MongoDB status:
-
-```bash
+# Check MongoDB status
 sudo systemctl status mongod
 ```
 
-**Expected output:** You should see `Active: active (running)` in green text.
-
-#### You should use **Ctrl + C** to stop server loading then continue
+Use **Ctrl + C** to exit the status view.
 
 ### Verify MongoDB Connection
-
-Test the MongoDB connection:
 
 ```bash
 mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 ```
 
-If MongoDB is working correctly, you should see `"ok" : 1` in the output 🎉.
+You should see `"ok" : 1` in the output if MongoDB is working correctly.
 
-## 1️⃣1️⃣ Setup Frontend
+---
 
-Navigate to the frontend folder and install dependencies:
+# 🚀 Running the Application
+
+The PathWise-AI system consists of four components that need to run simultaneously. Open **four separate Ubuntu (WSL) terminals** for the following:
+
+## Terminal 1: Frontend Server
 
 ```bash
-cd Pathwise-frontend
+cd PathWise-AI/Pathwise-frontend
 npm install
-```
-
-Start the frontend development server:
-
-```bash
 npm run dev
 ```
 
-If successful, your frontend will start running on `http://localhost:5173`.
+Frontend will be available at: `http://localhost:5173`
 
-## 1️⃣2️⃣ Setup Backend
-
-**Open a new terminal** in Ubuntu (WSL) while keeping the frontend running.
-
-Navigate to your project root and activate the Python environment:
+## Terminal 2: Backend Server
 
 ```bash
 cd PathWise-AI
 source .venv/bin/activate
-```
-
-Move into the backend folder:
-
-```bash
 cd Pathwise-backend
-```
-
-Install backend dependencies and start the server:
-
-```bash
 npm install
 npm start
 ```
 
-If MongoDB is running properly, the backend should connect successfully.
+## Terminal 3: AI Agent Setup and Server
 
-## 1️⃣3️⃣ Setup AI Agent
-
-**Open a third terminal** and navigate to the project root:
+### Install AI Dependencies
 
 ```bash
 cd PathWise-AI
 source .venv/bin/activate
-```
 
-Install uv and AI dependencies:
-
-```bash
+# Install uv and AI toolkit
 pip install uv
 uv add aiqtoolkit
 uv add fastapi uvicorn
 ```
 
-Install the agent:
+### Install and Configure Agent
 
 ```bash
+# Install the agent
 uv pip install -e .
 uv pip install -e nigeria_pathwise
-```
 
-Configure AI Agent:
-
-```bash
-# Delete existing agent to remove system symlink
+# Remove existing agent (if any) and create new one
 nat workflow delete nigeria_pathwise
-
-# Create the agent
 nat workflow create nigeria_pathwise
 ```
 
-Update Agent Files by replacing the following files with the latest versions from the repository:
+### Set Up Agent Configuration Files
 
-Create:
-```sh
-'config.yml' file in 'nigeria_pathwise/configs/' in your cloned repo
-# You might run into a 'file restriction error' in this case.
-instead, open 'src' that exists in the nigeria_pathwise folder.
+1. **Configure config.yml:**
+   ```bash
+   # Navigate to nigeria_pathwise/src/nigeria_pathwise/configs/
+   # Copy the config.yml file to nigeria_pathwise/configs/
+   # Then copy the content from the GitHub repository's config.yml
+   ```
 
-# open the nigeria_pathwise folder inside that as well, you should see the 'configs/config.yml that exists there.
+2. **Update function files:**
+   ```bash
+   # Replace content of nigeria_pathwise/nigeria_pathwise_function.py
+   # with the content from vector.py in the repository
+   ```
 
-click the 'config.yml' press Ctrl + x to cut/move the file and then
+3. **Create data directory and file:**
+   ```bash
+   # Create 'data' folder in nigeria_pathwise root directory
+   mkdir -p nigeria_pathwise/data
+   
+   # Create nigeria_career_guide.csv in the data folder
+   # Copy content from repository's nigeria_career_guide.csv
+   ```
 
-go to nigeria_pathwise root folder where we have our configs folder
-
-with no content and then press Ctrl + V to paste it IN the 'configs' folder or right click your mouse and choose paste.
-
-# Then copy the file content of the github repo:
-
-of nigeria_pathwise/configs/config.yml into your own file as well.
-```
-
-Also replace:
-```sh
-nigeria_pathwise/nigeria_pathwise_function.py content with:
-vector.py content in the repository
-```
-
-Create 'data' folder in 'nigeria_pathwise' root folder:
-
-```bash
-# In the 'data' folder create:
-nigeria_career_guide.csv file
-
-# Then copy the content of 'nigeria_career_guide.csv' that is in the repo
-To the 'nigeria_career_guide.csv' file that you created.
-```
-
-
-Run the AI Agent:
+### Start AI Agent
 
 ```bash
 nat serve --config_file nigeria_pathwise/configs/config.yml
 ```
 
-**Open another terminal in WSL/Ubuntu mode not powershell**
-
-## 1️⃣4️⃣ Install Flask Dependencies
-
-In a new terminal, activate the environment and install Flask:
+## Terminal 4: CORS Proxy Server
 
 ```bash
 cd PathWise-AI
 source .venv/bin/activate
+
+# Install Flask dependencies
 pip install flask flask_cors
-```
 
-
-## 1️⃣5️⃣ After that run:
-```sh
+# Start CORS proxy server
 python cors_proxy.py
 ```
 
-Then this server should activate as well, and you are good to go 🎉🎉🎉🎊
+---
 
+# ✅ Verification
 
-## ✅ Final Verification
+Once all four terminals are running, you should have:
 
-You should now have:
+1. **Frontend:** Running on `http://localhost:5173`
+2. **Backend:** Running on its configured port
+3. **MongoDB:** Active and connected
+4. **AI Agent:** Running with FastAPI
+5. **CORS Proxy:** Handling cross-origin requests
 
-1. **Frontend running** on `http://localhost:5173`
-2. **Backend running** on the configured port
-3. **MongoDB active** and connected
-4. **AI Agent** running with FastAPI
+Visit `http://localhost:5173` in your browser to access the PathWise-AI application.
 
-## 🔧 Important Notes
+---
 
-- **Virtual Environment:** Always activate your virtual environment (`source .venv/bin/activate`) before running backend commands or installing Python packages.
-- **MongoDB:** MongoDB is installed system-wide in Ubuntu, not inside your Python virtual environment.
-- **Auto-start:** With `systemctl enable`, MongoDB will automatically start every time WSL boots up.
-- **Terminal Management:** Keep your frontend, backend, and AI agent running in separate terminal windows.
+# 🔧 Development
 
-## 🚨 Troubleshooting
-
-### MongoDB Connection Issues:
-```bash
-# Check if MongoDB is running
-sudo systemctl status mongod
-
-# Restart MongoDB if needed
-sudo systemctl restart mongod
-```
-
-### Node.js Installation Issues:
-- Make sure you're connected to the internet
-- Try running `sudo apt update` again before the curl command
-
-### Virtual Environment Issues:
-- Make sure you're in the correct directory
-- Try recreating it: `rm -rf .venv && python3 -m venv .venv`
-
-### General Issues:
-- Ensure all ports are available (5173 for frontend, backend port, AI agent port)
-- Check browser console and backend logs for specific error messages
-- Verify environment variables are properly configured
-
-## Development
-
-### Build for Production
+## Build for Production
 
 ```bash
+cd Pathwise-frontend
 npm run build
 ```
 
-### Linting
+## Linting
 
 ```bash
 npm run lint
@@ -404,12 +296,66 @@ npm run lint
 
 ## Customization
 
-- To add or edit skills, modify `SkillsData.js`.
-- To update project sets for each role, edit `roleProjectSets.js`.
-- UI components can be found in `components/`.
-- AI agent configuration can be modified in the `config.yml` file.
+- **Skills:** Modify `src/data/SkillsData.js`
+- **Projects:** Edit `src/data/roleProjectSets.js`
+- **UI Components:** Found in `src/components/`
+- **AI Agent:** Configure in `nigeria_pathwise/configs/config.yml`
 
-## License
+---
+
+# 🚨 Troubleshooting
+
+## MongoDB Issues
+
+```bash
+# Check MongoDB status
+sudo systemctl status mongod
+
+# Restart MongoDB
+sudo systemctl restart mongod
+
+# View MongoDB logs
+sudo journalctl -u mongod
+```
+
+## Node.js Installation Issues
+
+```bash
+# Clear npm cache
+npm cache clean --force
+
+# Reinstall Node.js if needed
+sudo apt remove -y nodejs npm
+# Then repeat Node.js installation steps
+```
+
+## Virtual Environment Issues
+
+```bash
+# Recreate virtual environment
+rm -rf .venv
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+## Port Conflicts
+
+- Frontend: `http://localhost:5173`
+- Backend: Check your backend configuration
+- AI Agent: Check FastAPI startup logs
+- CORS Proxy: Check Flask startup logs
+
+## General Debugging Tips
+
+1. **Check all four terminals** are running their respective services
+2. **Verify MongoDB** is active: `sudo systemctl status mongod`
+3. **Check browser console** for frontend errors
+4. **Review terminal output** for specific error messages
+5. **Ensure virtual environment** is activated when running Python commands
+
+---
+
+# 📄 License
 
 [MIT](LICENSE)
 
