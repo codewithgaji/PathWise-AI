@@ -12,7 +12,8 @@ import {
   Trophy,
   Loader2,
   AlertCircle,
-  Video
+  Video,
+  X,
 } from "lucide-react";
 import skillsData from "../data/SkillsData";
 
@@ -36,6 +37,7 @@ export default function Skills() {
   const [selectedRole, setSelectedRole] = useState("");
   const [skills, setSkills] = useState([]);
   const [completedSkills, setCompletedSkills] = useState(new Set());
+    const [showVideo, setShowVideo] = useState(false);
   
   // AI API related states
   const [skillResources, setSkillResources] = useState({});
@@ -54,6 +56,11 @@ export default function Skills() {
     }),
     []
   );
+ // Extract YouTube video ID from url
+  const getYouTubeId = (url) => {
+    const urlObj = new URL(url);
+    return urlObj.searchParams.get("v");
+  };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -528,23 +535,49 @@ IMPORTANT: If you cannot provide real URLs, respond with null values instead of 
                             )}
 
                             {/* YouTube Video */}
-                            {resources.video && (
-                              <div 
-                                className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors group cursor-pointer"
-                                onClick={() => openExternalLink(resources.video.url)}
-                              >
-                                <Video className="w-4 h-4 text-red-500" />
-                                <div className="flex-1">
-                                  <span className="text-sm font-medium text-red-700 block">
-                                    {resources.video.title}
-                                  </span>
-                                  <span className="text-xs text-red-500">
-                                    YOUTUBE VIDEO {resources.video.channel && `• ${resources.video.channel}`}
-                                  </span>
-                                </div>
-                                <ExternalLink className="w-4 h-4 text-red-500 group-hover:text-red-700" />
-                              </div>
-                            )}
+                              {resources.video && (
+        <div
+          className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors group cursor-pointer"
+          onClick={() => setShowVideo(true)}
+        >
+          <Video className="w-4 h-4 text-red-500" />
+          <div className="flex-1">
+            <span className="text-sm font-medium text-red-700 block">
+              {resources.video.title}
+            </span>
+            <span className="text-xs text-red-500">
+              YOUTUBE VIDEO {resources.video.channel && `• ${resources.video.channel}`}
+            </span>
+          </div>
+          <ExternalLink className="w-4 h-4 text-red-500 group-hover:text-red-700" />
+        </div>
+      )}
+
+      {/* Popup Modal */}
+      {showVideo && (
+        <div className="fixed bottom-4 left-4 bg-white rounded-xl shadow-lg border p-2 w-80 z-50">
+          {/* Close Button */}
+          <button
+            className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            onClick={() => setShowVideo(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Embedded YouTube Video */}
+          <div className="aspect-w-16 aspect-h-9">
+            <iframe
+              className="w-full h-full rounded-lg"
+              src={`https://www.youtube.com/embed/${getYouTubeId(resources.video.url)}`}
+              title={resources.video.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
+                             
                           </div>
                         ) : (
                           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">

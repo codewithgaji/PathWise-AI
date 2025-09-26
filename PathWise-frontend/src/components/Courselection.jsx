@@ -1,7 +1,12 @@
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronDown, BookOpen } from 'lucide-react'; 
 import { ExpandProfile } from "./ExpandProfile";
+import nav from '../assets/hamburger.svg';
 import { useNavigate } from 'react-router-dom';
+import notifi from '../assets/notifi.svg';
+import profile from '../assets/profile.svg';
 
 const courses = [
   "Computer Science",
@@ -96,6 +101,21 @@ export const Courselection = () => {
 
   return (
     <div className="min-h-screen text-white relative overflow-hidden" style={{ background: '#101727' }}>
+      <div className="flex bg-white/10 p-5 justify-between items-center mb-12">
+          <h1 className="text-2xl font-bold  text-green-400  ">PATHWISE AI</h1>
+           <div className='flex gap-8'>
+            <div  className="relative group cursor-pointer px-4 rounded-[10px] pt-1 overflow-hidden border-2 font-medium text-black text-LG border-green-500 bg-green-500 transition-transform duration-300 hover:scale-105"
+              >
+                <span className="relative z-10 transition-transform duration-300 group-hover:scale-110">
+                  PREMUIM
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+            </div>
+            <img src={notifi} alt="" className='w-6' />
+            <img src={profile} alt="" className='w-10' />
+          </div> 
+          {/* <div className="text-green-400 text-xl">Hello, {firstname || "User"} <span className="fas fa-user text-white ml-2"></span></div> */}
+      </div>
       {/* Green elliptical blur effect - top left */}
       <div
         className="absolute pointer-events-none"
@@ -113,148 +133,102 @@ export const Courselection = () => {
       />
 
       {/* Another blur effect - bottom right */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: '-10%',
-          right: '10%',
-          width: '350px',
-          height: '175px',
-          background: '#01742B',
-          borderRadius: '50%',
-          filter: 'blur(70px)',
-          opacity: 0.3,
-          zIndex: 1
-        }}
-      />
+     
 
-      <div className="pt-10 px-10 relative z-10">
+      <div className="pt-8 px-10 relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="text-2xl font-bold text-green-400">PathWise AI</h1>
-          <div className="text-green-400 text-xl">Hello, {firstname || "User"} <span className="fas fa-user text-white ml-2"></span></div>
-        </div>
+        
 
         {/* Welcome Section */}
+        
         <div className="text-center mb-16">
-          <h2 className="text-6xl font-bold mb-6 text-green-400">
-            Welcome to PathWise AI
+          <h2 className="text-[3em] mont font-semibold mb-5 pt-0 text-green-400">
+           Discover Your Future
           </h2>
-          <p className="text-white text-xl mb-8 opacity-80">
-            Let's discover your perfect career path
-          </p>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed mb-8">
-            First, tell us about your academic background.
-          </p>
-          <p className="text-white text-lg font-medium">
-            What course are you studying (or did you study)?
-          </p>
+            <p className="text-white text-lg w-[60%] mx-auto  mb-4 opacity-80">
+              Let’s discover your perfect career path designed with clarity, powered by AI, and aligned with the future you’re meant to build
+            </p>
+             
         </div>
 
         {/* Search Section */}
-        <div className="max-w-2xl mx-auto mb-16">
-          <div className="relative" ref={dropdownRef}>
-            <div 
-              className="relative"
-              style={{
-                background: 'rgba(19, 21, 27, 0.3)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '50px',
-                border: '1px solid rgba(1, 116, 43, 0.3)'
-              }}
-            >
-              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-green-400 w-6 h-6" />
-              <input
-                type="text"
-                placeholder="Search for your course..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setIsDropdownOpen(true);
-                }}
-                onFocus={() => setIsDropdownOpen(true)}
-                className="pl-16 pr-16 py-6 text-lg rounded-full bg-transparent w-full text-white placeholder-gray-400 border-none outline-none"
-              />
-              <ChevronDown className="absolute right-6 top-1/2 transform -translate-y-1/2 text-green-400 w-6 h-6" />
-            </div>
-
-            {isDropdownOpen && (
+        <div className='w-[75%]  mx-auto  backdrop-blur bg-white/5 border border-green-500 rounded-xl pt-10 pb-5 shadow-2xl px-6'>
+          <p className="text-gray-300 text-center text-xl max-w-2xl mx-auto leading-relaxed mb-8">
+             What course are you studying (or did you study)?
+          </p>
+          
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              bottom: '-10%',
+              right: '0%',
+              width: '350px',
+              height: '175px',
+              background: '#01742B',
+              borderRadius: '50%',
+              filter: 'blur(70px)',
+              opacity: 0.3,
+              zIndex: 1
+            }}
+          />
+          <div className="max-w-2xl mx-auto mb-16">
+            <div className="relative" ref={dropdownRef}>
               <div 
-                className="absolute z-20 w-full mt-4 rounded-2xl shadow-2xl max-h-80 overflow-y-auto"
+                className="relative"
                 style={{
-                  background: 'rgba(19, 21, 27, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(1, 116, 43, 0.3)'
-                }}
-              >
-                {filteredCourses.map((course, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleCourseSelect(course)}
-                    className="w-full text-left px-6 py-4 hover:bg-green-500/20 first:rounded-t-2xl last:rounded-b-2xl transition-all duration-200 border-b border-gray-700/30 last:border-b-0 text-white"
-                  >
-                    <span className="font-medium">{course}</span>
-                  </button>
-                ))}
-                {filteredCourses.length === 0 && (
-                  <div className="px-6 py-4 text-gray-400 text-center">
-                    No courses found matching "{searchTerm}"
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Popular Courses Section */}
-        <div className="mb-20">
-          <h4 className="text-center text-green-400 text-2xl font-semibold mb-12">Popular Courses</h4>
-          <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              { name: "Computer Science", icon: "💻" },
-              { name: "Law", icon: "⚖️" },
-              { name: "Economics", icon: "📈" },
-              { name: "Business Administration", icon: "💼" },
-              { name: "Medicine", icon: "🩺" }
-            ].map((course, index) => (
-              <button
-                key={index}
-                onClick={() => handleCourseSelect(course.name)}
-                className="group relative overflow-hidden transition-all duration-300 hover:scale-105"
-                style={{
-                  background: 'rgba(19, 21, 27, 0.6)',
+                  background: 'rgba(19, 21, 27, 0.3)',
                   backdropFilter: 'blur(10px)',
-                  borderRadius: '20px',
-                  border: '1px solid rgba(1, 116, 43, 0.3)',
-                  padding: '2rem'
+                  borderRadius: '50px',
+                  border: '1px solid rgba(1, 116, 43, 0.51)'
                 }}
               >
-                {/* Gradient border effect on hover */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{
-                    borderRadius: '20px',
-                    padding: '1px',
-                    background: 'linear-gradient(to bottom, #01742B 0%, #019438 100%)',
-                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    WebkitMaskComposite: 'xor',
-                    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                    maskComposite: 'exclude'
+                <Search className="absolute  left-6 top-1/2 transform -translate-y-1/2 text-green-400 w-6 h-6" />
+                <input
+                  type="text"
+                  placeholder="Search for your course..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setIsDropdownOpen(true);
                   }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  className="pl-16  pr-16 py-6 text-lg rounded-full bg-transparent w-full text-white placeholder-gray-400 border-none outline-none"
                 />
-                
-                <div className="text-center relative z-10">
-                  <div className="text-4xl mb-4">{course.icon}</div>
-                  <div className="text-white font-medium text-lg">{course.name}</div>
+                <ChevronDown className="absolute right-6 top-1/2 transform -translate-y-1/2 text-green-400 w-6 h-6" />
+              </div>
+
+              {isDropdownOpen && (
+                <div 
+                  className="absolute border-4 border-red-500  w-full mt-4 rounded-2xl shadow-2xl max-h-80 overflow-y-auto"
+                  style={{
+                    background: 'rgba(19, 21, 27, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(1, 116, 43, 0.3)'
+                  }}
+                >
+                  {filteredCourses.map((course, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleCourseSelect(course)}
+                      className="w-full text-left px-6 py-4 hover:bg-green-500/20 first:rounded-t-2xl last:rounded-b-2xl transition-all duration-200 border-b border-gray-700/30 last:border-b-0 text-white"
+                    >
+                      <span className="font-medium">{course}</span>
+                    </button>
+                  ))}
+                  {filteredCourses.length === 0 && (
+                    <div className="px-6 py-4 text-gray-400 text-center">
+                      No courses found matching "{searchTerm}"
+                    </div>
+                  )}
                 </div>
-              </button>
-            ))}
+              )}
+            </div>
+          
           </div>
         </div>
-
-        {/* Selected Course Display */}
+         {/* Selected Course Display */}
         {selectedCourse && (
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-2xl mt-10 mx-auto mb-8">
             <div 
               className="rounded-2xl p-6"
               style={{
@@ -290,6 +264,52 @@ export const Courselection = () => {
             </button>
           </div>
         )}
+        {/* Popular Courses Section */}
+        <div className="mb-20 mt-10">
+          <h4 className="text-center text-green-400 text-2xl font-semibold mb-12">Popular Courses</h4>
+          <div className="  grid grid-cols-3 gap-8 max-w-4xl  mx-auto">
+            {[
+              { name: "Computer Science", icon: "💻" },
+              { name: "Law", icon: "⚖️" },
+              { name: "Economics", icon: "📈" },
+              { name: "Business Administration", icon: "💼" },
+              { name: "Medicine", icon: "🩺" }
+            ].map((course, index) => (
+              <button
+                key={index}
+                onClick={() => handleCourseSelect(course.name)}
+                className="group relative  overflow-hidden transition-all duration-300 hover:scale-105"
+                style={{
+                  background: 'rgba(19, 21, 27, 0.6)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(1, 116, 43, 0.3)',
+                  padding: '2rem',
+                  zIndex:'-10'
+                }}
+              >
+                {/* Gradient border effect on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{
+                    borderRadius: '20px',
+                    padding: '1px',
+                    background: 'linear-gradient(to bottom, #01742B 0%, #019438 100%)',
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                    mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    maskComposite: 'exclude'
+                  }}
+                />
+                
+                <div className="text-center relative">
+                  <div className="text-4xl mb-4">{course.icon}</div>
+                  <div className="text-white font-medium text-lg">{course.name}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
