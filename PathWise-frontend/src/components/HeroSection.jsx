@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Journey from '/images/journey.png';
 
 export default function HeroSection() {
   const [studentsCount, setStudentsCount] = useState(0);
@@ -91,6 +92,19 @@ export default function HeroSection() {
           </div>
         </div>
       </div>
+
+      {/* Journey Image */}
+        <div className="w-full mt-16 mb-10">
+          <img 
+            src={Journey} 
+            alt="Career Journey Roadmap" 
+            className="w-full h-auto object-cover opacity-95"
+            style={{ 
+              filter: 'brightness(1.1) contrast(1.2) saturate(1.1)',
+              borderRadius: 0
+             }}
+          />
+        </div>
     </section>
   );
 }
