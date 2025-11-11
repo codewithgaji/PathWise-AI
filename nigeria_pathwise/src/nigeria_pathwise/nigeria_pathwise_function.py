@@ -37,13 +37,14 @@ from langchain import hub
 from langchain_core.tools import tool
 from langchain_core.prompts import PromptTemplate
 
+# NAT imports - UPDATED from aiq to nat
 from nat.builder.builder import Builder
 from nat.builder.framework_enum import LLMFrameworkEnum
 from nat.builder.function_info import FunctionInfo
 from nat.cli.register_workflow import register_function
 from nat.data_models.component_ref import EmbedderRef, FunctionRef, LLMRef
 from nat.data_models.function import FunctionBaseConfig
-from nat.data_models.api_server import AIQChatRequest, AIQChatResponse
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -552,7 +553,7 @@ When users ask for resources, you should:
 Remember: Your goal is to empower users to make informed career decisions and achieve their professional aspirations through structured guidance and continuous support.
 """
 
-@register_function(config_type=NigeriaPathwiseFunctionConfig)
+@register_function(config_type=NigeriaPathwiseFunctionConfig, framework_wrappers=[LLMFrameworkEnum.LANGCHAIN])
 async def nigeria_pathwise_function(
     config: NigeriaPathwiseFunctionConfig, builder: Builder
 ):
@@ -562,10 +563,10 @@ async def nigeria_pathwise_function(
     
     # Initialize components
     llm_ref = LLMRef(config.llm_name)
-    llm = await builder.get_llm(llm_ref, LLMFrameworkEnum.LANGCHAIN)
+    llm = await builder.get_llm(llm_ref, wrapper_type=LLMFrameworkEnum.LANGCHAIN)
 
     embedder_ref = EmbedderRef(config.embedder_name)
-    embedder = await builder.get_embedder(embedder_ref, LLMFrameworkEnum.LANGCHAIN)
+    embedder = await builder.get_embedder(embedder_ref, wrapper_type=LLMFrameworkEnum.LANGCHAIN)
     
     # Document processing and retrieval setup
     vector_store = None
