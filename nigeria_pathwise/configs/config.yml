@@ -1,21 +1,12 @@
 general:
-  use_uvloop: true
-  logging:
-    console:
-      _type: console
-      level: INFO
-
   front_end:
     _type: fastapi
+    host: ${HOST:-0.0.0.0}
+    port: ${PORT:-8000}
 
 functions:
   current_datetime:
     _type: current_datetime
-
-  # Use Tavily for web search (available in AIQ)
-  tavily_search:
-    _type: tavily_internet_search
-    max_results: 50
 
 llms:
   nim_llm:
@@ -23,7 +14,7 @@ llms:
     model_name: nvidia/llama-3.3-nemotron-super-49b-v1.5
     temperature: 0.7
     max_tokens: 4096
-    api_key: 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
+    api_key: ${NVIDIA_API_KEY}
 
 embedders:
   nim_embedder:
@@ -34,7 +25,6 @@ workflow:
   _type: nigeria_pathwise
   tool_names:
     - current_datetime
-    - tavily_search
   llm_name: nim_llm
   embedder_name: nim_embedder
   max_history: 30
