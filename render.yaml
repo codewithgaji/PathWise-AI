@@ -11,7 +11,7 @@ services:
       pip install -e .
       pip install flask flask-cors requests python-dotenv PyMuPDF pandas numpy langchain langchain-nvidia-ai-endpoints langchain-community faiss-cpu
     startCommand: |
-      aiq serve --config nigeria_pathwise/src/nigeria_pathwise/configs/config.yml --host 0.0.0.0 --port 8000
+      nat serve --config_file nigeria_pathwise/src/nigeria_pathwise/configs/config.yml --host 0.0.0.0 --port 8000
     envVars:
       - key: NVIDIA_API_KEY
         value: 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
