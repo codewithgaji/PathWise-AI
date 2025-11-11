@@ -1,17 +1,12 @@
 # Core AIQ/NAT dependencies
-aiqtoolkit>=1.1.0
+aiqtoolkit>=1.2.0
+nvidia-nat[langchain]>=1.2.0
 
 # Web frameworks
 fastapi
 uvicorn[standard]
 flask
 flask-cors
-
-# LangChain and NVIDIA
-langchain>=0.1.0
-langchain-nvidia-ai-endpoints
-langchain-community
-langchain-core
 
 # Vector store and embeddings
 faiss-cpu
