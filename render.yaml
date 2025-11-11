@@ -1,0 +1,49 @@
+services:
+  # Nigeria Pathwise Agent Service (Backend on port 8000)
+  - type: web
+    name: nigeria-pathwise-agent
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: |
+      pip install --upgrade pip
+      cd nigeria_pathwise && pip install -e . && cd ..
+      pip install -e .
+      pip install flask flask-cors requests python-dotenv PyMuPDF pandas numpy langchain langchain-nvidia-ai-endpoints langchain-community faiss-cpu
+    startCommand: |
+      aiq serve --config nigeria_pathwise/src/nigeria_pathwise/configs/config.yml --host 0.0.0.0 --port 8000
+    envVars:
+      - key: NVIDIA_API_KEY
+        value: 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
+      - key: PORT
+        value: 8000
+      - key: HOST
+        value: 0.0.0.0
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: TAVILY_API_KEY
+        sync: false
+    healthCheckPath: /health
+
+  # CORS Proxy Service (Frontend-facing on port 3001)
+  - type: web
+    name: nigeria-pathwise-cors-proxy
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: |
+      pip install --upgrade pip
+      pip install flask flask-cors requests
+    startCommand: |
+      python cors_proxy.py
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: AGENT_BASE_URL
+        fromService:
+          type: web
+          name: nigeria-pathwise-agent
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /test
