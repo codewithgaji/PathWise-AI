@@ -607,7 +607,7 @@ async def nigeria_pathwise_function(
     additional_tools = []
     for tool_name in config.tool_names:
         try:
-            tool_ref = FunctionRef(name=tool_name)
+            tool_ref = FunctionRef(tool_name)
             tool = await builder.get_function_as_tool(tool_ref)
             additional_tools.append(tool)
         except Exception as e:
