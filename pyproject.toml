@@ -8,12 +8,10 @@ version = "0.1.0"
 description = "Pathwise AI agent"
 requires-python = ">=3.11"
 dependencies = [
-    "aiqtoolkit>=1.1.0",
-    # Add your project dependencies here
+    "aiqtoolkit>=1.2.0",
     "fastapi",
     "uvicorn[standard]",
-    # Install AIQ toolkit from PyPI or git
-    # "aiqtoolkit",
+    "nvidia-nat>=1.2.0"
 ]
 
 [project.optional-dependencies]
@@ -26,7 +24,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["wakamate_*"]
+include = ["*"]
 
 # Code formatting
 [tool.black]
