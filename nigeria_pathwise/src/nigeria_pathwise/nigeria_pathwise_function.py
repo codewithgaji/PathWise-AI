@@ -561,11 +561,11 @@ async def nigeria_pathwise_function(
     """
     
     # Initialize components
-    llm_ref = LLMRef(name=config.llm_name)
-    llm = await builder.get_llm(llm_ref)
-    
-    embedder_ref = EmbedderRef(name=config.embedder_name)
-    embedder = await builder.get_embedder(embedder_ref)
+    llm_ref = LLMRef(config.llm_name)
+    llm = await builder.get_llm(llm_ref, LLMFrameworkEnum.LANGCHAIN)
+
+    embedder_ref = EmbedderRef(config.embedder_name)
+    embedder = await builder.get_embedder(embedder_ref, LLMFrameworkEnum.LANGCHAIN)
     
     # Document processing and retrieval setup
     vector_store = None
