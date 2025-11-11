@@ -1,0 +1,43 @@
+# Core AIQ/NAT dependencies
+aiqtoolkit>=1.1.0
+
+# Web frameworks
+fastapi
+uvicorn[standard]
+flask
+flask-cors
+
+# LangChain and NVIDIA
+langchain>=0.1.0
+langchain-nvidia-ai-endpoints
+langchain-community
+langchain-core
+
+# Vector store and embeddings
+faiss-cpu
+
+# Document processing
+PyMuPDF
+pypdf
+
+# Data processing
+pandas
+numpy
+
+# Utilities
+python-multipart
+pydantic>=2.0.0
+python-dotenv
+requests
+
+# Text processing
+langchain-text-splitters
+
+# Optional: for better performance
+uvloop
+
+# Development (optional)
+pytest
+black
+isort
+flake8
