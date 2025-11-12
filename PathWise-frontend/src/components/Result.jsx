@@ -30,7 +30,7 @@ export default function Result() {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [feedbackError, setFeedbackError] = useState(null);
 
-  const API_BASE_URL = 'http://localhost:3001/api';
+  const API_BASE_URL = 'https://africulture-1.onrender.com/api';
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
