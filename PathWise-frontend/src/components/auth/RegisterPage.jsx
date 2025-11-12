@@ -44,7 +44,7 @@ const RegisterPage = () => {
     try {
       console.log('Submitting registration for:', formData.email);
       
-      const res = await fetch('http://localhost:1180/api/users/register', {
+      const res = await fetch('https://pathwise-backend-j09c.onrender.com/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -109,7 +109,7 @@ const EmailVerifyPage = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:1180/api/users/verify', {
+      const res = await fetch('https://pathwise-backend-j09c.onrender.com/api/users/verify', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ const EmailVerifyPage = () => {
     setResendLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/users/register', {
+      const res = await fetch('https://pathwise-backend-j09c.onrender.com/api/users/register', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

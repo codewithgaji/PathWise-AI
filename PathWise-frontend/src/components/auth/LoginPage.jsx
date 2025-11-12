@@ -18,7 +18,7 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:1180/api/users/login', {
+      const res = await fetch('https://pathwise-backend-j09c.onrender.com/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
