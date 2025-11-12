@@ -44,7 +44,7 @@ export default function Skills() {
   const [loadingResources, setLoadingResources] = useState({});
   const [resourceErrors, setResourceErrors] = useState({});
 
-  const API_BASE_URL = 'http://localhost:3001/api'; // Same as DeliveryAss.jsx and Skillsnew.jsx
+  const API_BASE_URL = 'https://africulture-1.onrender.com/api'; // Same as DeliveryAss.jsx and Skillsnew.jsx
 
   const pageRoutes = useMemo(
     () => ({
