@@ -74,7 +74,7 @@ export default function ProjectStage() {
   const [validationError, setValidationError] = useState(null);
 
   // API Configuration (same as Skillsnew.jsx)
-  const API_BASE_URL = 'http://localhost:3001/api';
+  const API_BASE_URL = 'https://africulture-1.onrender.com/api';
 
   // AI Code Validation Functions
   const validateCodeWithAI = async (code, project) => {
