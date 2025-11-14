@@ -17,16 +17,29 @@ connectDB();
 
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+
+// CORS CONFIGURATION
+app.use(
+  cors({
+    origin: [
+      "https://path-wise-ai.vercel.app",
+      "http://localhost:5173"
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
 app.use(morgan("dev"));
 
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
-//routes
+// Routes
 app.use("/api/users", userRoutes);
 
-//connection
+// Connection
 const PORT = process.env.PORT || 1180;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
