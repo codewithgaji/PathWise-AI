@@ -8,7 +8,7 @@ export default function HeroSection() {
 
   useEffect(() => {
     const animateCounters = () => {
-      const duration = 4000;// 4seconds
+      const duration = 4000; // 4 seconds
       const steps = 60; // 60 steps for smooth animation
       const stepDuration = duration / steps;
 
@@ -24,7 +24,6 @@ export default function HeroSection() {
 
         if (currentStep >= steps) {
           clearInterval(interval);
-          // Set final values to ensure exact numbers
           setStudentsCount(10000);
           setCareerPathsCount(500);
           setSuccessRateCount(95);
@@ -39,14 +38,23 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="min-h-screen flex flex-col justify-center items-center px-6" style={{ background: 'linear-gradient(135deg, #1a4a3a 0%, #2d5a4a 20%, #101727 50%, #0f2419 80%, #101727 100%)' }}>
+    <section
+      className="min-h-screen flex flex-col justify-center items-center px-6"
+      style={{
+        background:
+          'linear-gradient(135deg, #1a4a3a 0%, #2d5a4a 20%, #101727 50%, #0f2419 80%, #101727 100%)',
+      }}
+    >
       <div className="max-w-5xl mx-auto text-center">
+
         {/* Badge */}
         <div className="inline-flex items-center space-x-2 bg-gray-800 bg-opacity-50 px-6 py-3 rounded-full mb-12 border border-gray-700 mt-7">
           <span className="text-2xl">🚀</span>
-          <span className="text-green-400 font-medium">Your personalized career journey starts here</span>
+          <span className="text-green-400 font-medium">
+            Your personalized career journey starts here
+          </span>
         </div>
-        
+
         {/* Main Heading */}
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
           Your Career Roadmap,
@@ -56,15 +64,21 @@ export default function HeroSection() {
 
         {/* Subtitle */}
         <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-          Stop wandering through endless courses. Get a step-by-step roadmap 
+          Stop wandering through endless courses. Get a step-by-step roadmap
           tailored to your goals, from beginner to industry standard.
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
-          <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors min-w-48">
+
+          {/* Updated Button to redirect to /register */}
+          <button
+            onClick={() => (window.location.href = '/register')}
+            className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors min-w-48"
+          >
             Start Your Journey
           </button>
+
           <button className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors min-w-48">
             Watch Demo
           </button>
@@ -78,12 +92,14 @@ export default function HeroSection() {
             </div>
             <div className="text-gray-400 text-lg">Students Guided</div>
           </div>
+
           <div className="text-center">
             <div className="text-4xl md:text-5xl font-bold text-green-500 mb-2">
               {careerPathsCount}+
             </div>
             <div className="text-gray-400 text-lg">Career Paths</div>
           </div>
+
           <div className="text-center">
             <div className="text-4xl md:text-5xl font-bold text-green-500 mb-2">
               {successRateCount}%
@@ -94,17 +110,17 @@ export default function HeroSection() {
       </div>
 
       {/* Journey Image */}
-        <div className="w-full mt-16 mb-10">
-          <img 
-            src={Journey} 
-            alt="Career Journey Roadmap" 
-            className="w-full h-auto object-cover opacity-95"
-            style={{ 
-              filter: 'brightness(1.1) contrast(1.2) saturate(1.1)',
-              borderRadius: 0
-             }}
-          />
-        </div>
+      <div className="w-full mt-16 mb-10">
+        <img
+          src={Journey}
+          alt="Career Journey Roadmap"
+          className="w-full h-auto object-cover opacity-95"
+          style={{
+            filter: 'brightness(1.1) contrast(1.2) saturate(1.1)',
+            borderRadius: 0,
+          }}
+        />
+      </div>
     </section>
   );
 }
